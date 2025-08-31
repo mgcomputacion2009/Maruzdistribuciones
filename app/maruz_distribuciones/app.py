@@ -39,6 +39,10 @@ def create_app():
     from app.maruz_distribuciones.api.auth_google import auth_bp
     app.register_blueprint(auth_bp)
     
+    # Registrar el blueprint de autenticación local (email/contraseña)
+    from app.maruz_distribuciones.api.auth_local import auth_local_bp
+    app.register_blueprint(auth_local_bp)
+    
     # Crear tablas de base de datos si no existen
     with app.app_context():
         try:

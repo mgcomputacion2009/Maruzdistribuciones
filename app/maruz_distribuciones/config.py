@@ -16,6 +16,9 @@ class Config:
     DEBUG = True
     PORT = 8002
     
+    # Configuración de seguridad
+    SECRET_KEY = os.getenv('SECRET_KEY', 'maruz_jwt_secret_2024_development_key')
+    
     # Configuración de base de datos
     DB_HOST = os.getenv('DB_HOST', '127.0.0.1')
     DB_PORT = int(os.getenv('DB_PORT', 3306))

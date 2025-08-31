@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Maruz Distribuciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -27,6 +28,51 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             text-align: center;
+            position: relative;
+        }
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #28a745;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .user-details {
+            text-align: right;
+        }
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .user-email {
+            color: #666;
+            font-size: 12px;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+        .logout-btn:hover {
+            background: #c82333;
         }
         .company-name {
             color: #28a745;
@@ -53,6 +99,11 @@
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
         .card h3 {
             color: #28a745;
@@ -68,18 +119,91 @@
             text-decoration: none;
             display: inline-block;
             margin: 10px 5px;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
         }
         .btn:hover {
             background: #218838;
+            transform: translateY(-2px);
+        }
+        .welcome-message {
+            background: #e7f3ff;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #bee5eb;
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <div class="header">
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-details">
+                    <div class="user-name" id="userName">Usuario</div>
+                    <div class="user-email" id="userEmail">usuario@email.com</div>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+            
             <h1 class="company-name">Maruz Distribuciones</h1>
             <p>Panel de Control - Instancia de Desarrollo</p>
+            
+            <div class="welcome-message" id="welcomeMessage" style="display: none;">
+                <h3>¡Bienvenido de vuelta!</h3>
+                <p>Has iniciado sesión correctamente en tu cuenta</p>
+            </div>
             
             <div class="development-info">
                 <strong>🔧 MODO DESARROLLO</strong><br>
@@ -87,30 +211,50 @@
             </div>
         </div>
         
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalProductos">0</div>
+                <div class="stat-label">Total Productos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalCategorias">0</div>
+                <div class="stat-label">Categorías</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="ultimaActualizacion">-</div>
+                <div class="stat-label">Última Actualización</div>
+            </div>
+        </div>
+        
         <div class="grid">
             <div class="card">
-                <h3>🔐 Autenticación</h3>
-                <p>Sistema de login y usuarios</p>
-                <a href="/login" class="btn">Ir a Login</a>
+                <h3><i class="fas fa-user-cog"></i> Perfil</h3>
+                <p>Gestiona tu información personal y contraseña</p>
+                <button class="btn" onclick="showProfile()">Mi Perfil</button>
             </div>
             
             <div class="card">
-                <h3>📦 Productos</h3>
+                <h3><i class="fas fa-boxes"></i> Productos</h3>
                 <p>Gestión de inventario y catálogo</p>
                 <a href="/productos" class="btn">Ver Productos</a>
             </div>
             
             <div class="card">
-                <h3>📊 Reportes</h3>
+                <h3><i class="fas fa-chart-bar"></i> Reportes</h3>
                 <p>Análisis y estadísticas</p>
-                <a href="#" class="btn" onclick="alert('En desarrollo')">Próximamente</a>
+                <button class="btn" onclick="showComingSoon('Reportes')">Próximamente</button>
             </div>
             
             <div class="card">
-                <h3>⚙️ Configuración</h3>
+                <h3><i class="fas fa-cog"></i> Configuración</h3>
                 <p>Ajustes del sistema</p>
-                <a href="#" class="btn" onclick="alert('En desarrollo')">Próximamente</a>
+                <button class="btn" onclick="showComingSoon('Configuración')">Próximamente</button>
             </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Cargando información...</p>
         </div>
         
         <div class="development-info" style="margin-top: 40px; text-align: center;">
@@ -120,5 +264,113 @@
             <p><strong>Base de Datos:</strong> Compartida entre ambas instancias</p>
         </div>
     </div>
+    
+    <script>
+        // Verificar autenticación al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+        });
+        
+        function checkAuthStatus() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                // No autenticado, redirigir al login
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Verificar token
+            verifyToken(token);
+        }
+        
+        async function verifyToken(token) {
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: token })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.valid) {
+                    // Token válido, mostrar información del usuario
+                    showUserInfo(data.user);
+                    loadDashboardData();
+                } else {
+                    // Token inválido, redirigir al login
+                    localStorage.removeItem('authToken');
+                    window.location.href = '/login';
+                }
+                
+            } catch (error) {
+                console.error('Error verificando token:', error);
+                localStorage.removeItem('authToken');
+                window.location.href = '/login';
+            }
+        }
+        
+        function showUserInfo(user) {
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('userName').textContent = user.nombre || 'Usuario';
+            document.getElementById('userEmail').textContent = user.email || 'usuario@email.com';
+            
+            // Mostrar mensaje de bienvenida
+            document.getElementById('welcomeMessage').style.display = 'block';
+            
+            // Si tiene avatar, mostrarlo
+            if (user.avatar_url) {
+                document.getElementById('userAvatar').innerHTML = `<img src="${user.avatar_url}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            }
+        }
+        
+        async function loadDashboardData() {
+            showLoading(true);
+            
+            try {
+                // Aquí podrías cargar estadísticas reales desde la API
+                // Por ahora mostraremos datos de ejemplo
+                setTimeout(() => {
+                    document.getElementById('totalProductos').textContent = '1,247';
+                    document.getElementById('totalCategorias').textContent = '23';
+                    document.getElementById('ultimaActualizacion').textContent = 'Hoy';
+                    
+                    document.getElementById('statsGrid').style.display = 'grid';
+                    showLoading(false);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error cargando datos del dashboard:', error);
+                showLoading(false);
+            }
+        }
+        
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) {
+                loading.classList.add('show');
+            } else {
+                loading.classList.remove('show');
+            }
+        }
+        
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('rememberMe');
+                window.location.href = '/login';
+            }
+        }
+        
+        function showProfile() {
+            alert('Funcionalidad de perfil en desarrollo');
+        }
+        
+        function showComingSoon(feature) {
+            alert(`${feature} estará disponible próximamente`);
+        }
+    </script>
 </body>
 </html>

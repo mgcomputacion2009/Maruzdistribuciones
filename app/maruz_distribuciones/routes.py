@@ -3,6 +3,7 @@ import os
 from sqlalchemy import text
 from time import time
 from app.maruz_distribuciones.app import db
+from app.maruz_distribuciones.decorators import login_required
 
 # Blueprint para Maruz Distribuciones (Desarrollo)
 bp = Blueprint("main", __name__)
@@ -15,9 +16,8 @@ def home():
 def login():
     return render_template("login.html")
 
-
-
 @bp.route("/dashboard")
+@login_required
 def dashboard():
     return render_template("dashboard.html")
 

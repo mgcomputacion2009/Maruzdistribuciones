@@ -31,20 +31,39 @@
                        class="form-input" 
                        placeholder="Ingresa tu correo"
                        required>
+                <div class="error-message" id="emailError"></div>
             </div>
             
             <div class="form-group">
                 <label for="password" class="form-label">Contraseña</label>
-                <input type="password" 
-                       id="password" 
-                       class="form-input" 
-                       placeholder="Ingresa tu contraseña"
-                       required>
+                <div class="password-input-container">
+                    <input type="password" 
+                           id="password" 
+                           class="form-input" 
+                           placeholder="Ingresa tu contraseña"
+                           required>
+                    <button type="button" class="password-toggle" id="passwordToggle">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="error-message" id="passwordError"></div>
             </div>
             
-            <button type="submit" class="login-button">
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="rememberMe">
+                    <span class="checkmark"></span>
+                    Recordarme
+                </label>
+                <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+            </div>
+            
+            <button type="submit" class="login-button" id="loginButton">
                 <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
-                Iniciar Sesión
+                <span class="button-text">Iniciar Sesión</span>
+                <div class="spinner" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
             </button>
         </form>
         
@@ -53,20 +72,25 @@
         
         <!-- Social Login Buttons -->
         <div class="social-buttons">
-            <button class="social-button google-button">
+            <button class="social-button google-button" id="googleLogin">
                 <i class="fab fa-google"></i>
                 Continuar con Google
             </button>
             
-            <button class="social-button apple-button">
+            <button class="social-button apple-button" id="appleLogin">
                 <i class="fab fa-apple"></i>
                 Continuar con Apple
             </button>
             
-            <button class="social-button facebook-button">
+            <button class="social-button facebook-button" id="facebookLogin">
                 <i class="fab fa-facebook-f"></i>
                 Continuar con Facebook
             </button>
+        </div>
+        
+        <!-- Register Link -->
+        <div class="register-section">
+            <p>¿No tienes una cuenta? <a href="#" id="showRegister">Regístrate aquí</a></p>
         </div>
         
         <!-- Development Badge -->
@@ -80,23 +104,94 @@
         </a>
     </div>
     
-    <!-- Development Modal -->
-    <div id="developmentModal" class="modal">
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
         <div class="modal-content">
-            <span class="modal-close">&times;</span>
+            <span class="modal-close" id="closeRegister">&times;</span>
             
+            <h2 class="modal-title">Crear Cuenta</h2>
+            <p class="modal-subtitle">Regístrate para acceder a Maruz Distribuciones</p>
+            
+            <form id="registerForm" class="register-form">
+                <div class="form-group">
+                    <label for="regNombre" class="form-label">Nombre</label>
+                    <input type="text" id="regNombre" class="form-input" required>
+                    <div class="error-message" id="regNombreError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regApellido" class="form-label">Apellido</label>
+                    <input type="text" id="regApellido" class="form-input" required>
+                    <div class="error-message" id="regApellidoError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail" class="form-label">Correo electrónico</label>
+                    <input type="email" id="regEmail" class="form-input" required>
+                    <div class="error-message" id="regEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword" class="form-label">Contraseña</label>
+                    <div class="password-input-container">
+                        <input type="password" id="regPassword" class="form-input" required>
+                        <button type="button" class="password-toggle" id="regPasswordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="regPasswordError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword" class="form-label">Confirmar contraseña</label>
+                    <div class="password-input-container">
+                        <input type="password" id="regConfirmPassword" class="form-input" required>
+                        <button type="button" class="password-toggle" id="regConfirmPasswordToggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="regConfirmPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="register-button" id="registerButton">
+                    <span class="button-text">Crear Cuenta</span>
+                    <div class="spinner" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </button>
+            </form>
+            
+            <div class="modal-footer">
+                <p>¿Ya tienes una cuenta? <a href="#" id="showLogin">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
             <div class="modal-icon">
-                <i class="fas fa-cog loading-gear"></i>
+                <i class="fas fa-check-circle"></i>
             </div>
             
-            <h2 class="modal-title">En Desarrollo</h2>
-            <p class="modal-text">
-                Estamos trabajando en esta funcionalidad. 
-                Nuestro equipo de desarrollo está construyendo algo increíble para ti. 
-                ¡Vuelve pronto!
-            </p>
+            <h2 class="modal-title" id="successTitle">¡Éxito!</h2>
+            <p class="modal-text" id="successMessage">Operación completada exitosamente</p>
             
-            <button class="modal-button">Entendido</button>
+            <button class="modal-button" id="successButton">Continuar</button>
+        </div>
+    </div>
+    
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon error">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <h2 class="modal-title">Error</h2>
+            <p class="modal-text" id="errorMessage">Ha ocurrido un error</p>
+            
+            <button class="modal-button" id="errorButton">Entendido</button>
         </div>
     </div>
     
