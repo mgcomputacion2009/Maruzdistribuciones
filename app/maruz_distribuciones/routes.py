@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, current_app, send_from_directory, abort, url_for, make_response
+from flask import Blueprint, render_template, request, current_app, send_from_directory, abort, url_for, make_response, g
 import os
 from sqlalchemy import text
 from time import time
@@ -19,7 +19,11 @@ def login():
 @bp.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    # Si hay usuario en g (del decorador), usarlo
+    if hasattr(g, 'current_user'):
+        return render_template("dashboard.html", user=g.current_user)
+    # Si no hay usuario, mostrar error o redirigir
+    return render_template("dashboard.html", user=None)
 
 @bp.route("/productos")
 def productos():

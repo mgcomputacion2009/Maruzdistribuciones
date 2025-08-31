@@ -340,8 +340,38 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handlers de login social
     function handleGoogleLogin() {
-        // Por ahora mostrar modal de desarrollo
-        showError('Login con Google en desarrollo');
+        if (!window.google || !google.accounts || !google.accounts.id) {
+            showError('No se pudo cargar Google Sign-In. Refresca la página.');
+            return;
+        }
+        google.accounts.id.initialize({
+            client_id: '762557699781-7989d74ns8p0ihhr43dupbamgktsce7e.apps.googleusercontent.com',
+            callback: handleGoogleCallback
+        });
+        google.accounts.id.prompt();
+    }
+
+    async function handleGoogleCallback(response) {
+        try {
+            const result = await fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: response.credential })
+            });
+            const data = await result.json();
+            if (data.success) {
+                localStorage.setItem('authToken', data.token);
+                isAuthenticated = true;
+                currentUser = data.user;
+                showSuccess('Login con Google exitoso', 'Redirigiendo al dashboard...');
+                setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
+            } else {
+                showError(data.error || 'Error en el login con Google');
+            }
+        } catch (err) {
+            console.error(err);
+            showError('Error de conexión con el servidor');
+        }
     }
     
     function handleAppleLogin() {

@@ -13,9 +13,11 @@ class Usuario(db.Model):
     password_hash = db.Column(db.String(255), nullable=True)  # Nullable para usuarios de Google
     nombre = db.Column(db.String(100), nullable=False)
     apellido = db.Column(db.String(100), nullable=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    whatsapp = db.Column(db.String(20), nullable=True)
     google_id = db.Column(db.String(100), unique=True, nullable=True, index=True)
     avatar_url = db.Column(db.String(500), nullable=True)
-    rol = db.Column(db.String(20), default='usuario')  # usuario, admin, vendedor
+    rol = db.Column(db.String(20), default='cliente')  # cliente, admin, vendedor
     activo = db.Column(db.Boolean, default=True)
     ultimo_login = db.Column(db.DateTime, nullable=True)
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
@@ -65,6 +67,8 @@ class Usuario(db.Model):
             'email': self.email,
             'nombre': self.nombre,
             'apellido': self.apellido,
+            'telefono': self.telefono,
+            'whatsapp': self.whatsapp,
             'avatar_url': self.avatar_url,
             'rol': self.rol,
             'activo': self.activo,
@@ -90,7 +94,10 @@ class Usuario(db.Model):
             nombre=google_data.get('name', 'Usuario'),
             google_id=google_data['sub'],
             avatar_url=google_data.get('picture'),
-            password_hash=None  # Usuario de Google no tiene contraseña
+            password_hash=None,  # Usuario de Google no tiene contraseña
+            telefono=None,
+            whatsapp=None,
+            rol='cliente'
         )
         db.session.add(usuario)
         db.session.commit()

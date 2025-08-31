@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <div class="login-container">
@@ -72,25 +73,18 @@
         
         <!-- Social Login Buttons -->
         <div class="social-buttons">
-            <button class="social-button google-button" id="googleLogin">
+            <a class="social-button google-button" href="{{ url_for('oauth_auth.login_google') }}">
                 <i class="fab fa-google"></i>
                 Continuar con Google
-            </button>
-            
-            <button class="social-button apple-button" id="appleLogin">
-                <i class="fab fa-apple"></i>
-                Continuar con Apple
-            </button>
-            
-            <button class="social-button facebook-button" id="facebookLogin">
-                <i class="fab fa-facebook-f"></i>
-                Continuar con Facebook
-            </button>
+            </a>
         </div>
         
-        <!-- Register Link -->
-        <div class="register-section">
-            <p>¿No tienes una cuenta? <a href="#" id="showRegister">Regístrate aquí</a></p>
+        <!-- Info Section -->
+        <div class="info-section">
+            <button class="info-button" id="showInfo" style="background: none; border: none; color: #666; cursor: pointer; text-decoration: underline; font-size: 14px;">
+                <i class="fas fa-info-circle"></i>
+                ¿Cómo funciona el registro?
+            </button>
         </div>
         
         <!-- Development Badge -->
@@ -104,66 +98,35 @@
         </a>
     </div>
     
-    <!-- Register Modal -->
-    <div id="registerModal" class="modal">
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
         <div class="modal-content">
-            <span class="modal-close" id="closeRegister">&times;</span>
+            <span class="modal-close" id="closeInfo">&times;</span>
             
-            <h2 class="modal-title">Crear Cuenta</h2>
-            <p class="modal-subtitle">Regístrate para acceder a Maruz Distribuciones</p>
+            <h2 class="modal-title">Información</h2>
+            <p class="modal-subtitle">Proceso de registro simplificado</p>
             
-            <form id="registerForm" class="register-form">
-                <div class="form-group">
-                    <label for="regNombre" class="form-label">Nombre</label>
-                    <input type="text" id="regNombre" class="form-input" required>
-                    <div class="error-message" id="regNombreError"></div>
+            <div class="info-content">
+                <div class="info-item">
+                    <i class="fas fa-google" style="color: #4285f4; font-size: 24px; margin-bottom: 10px;"></i>
+                    <h3>1. Login con Google</h3>
+                    <p>Haz clic en "Continuar con Google" para autenticarte</p>
                 </div>
                 
-                <div class="form-group">
-                    <label for="regApellido" class="form-label">Apellido</label>
-                    <input type="text" id="regApellido" class="form-input" required>
-                    <div class="error-message" id="regApellidoError"></div>
+                <div class="info-item">
+                    <i class="fas fa-user-edit" style="color: #28a745; font-size: 24px; margin-bottom: 10px;"></i>
+                    <h3>2. Completar Perfil</h3>
+                    <p>Llena el formulario con tu información personal</p>
                 </div>
                 
-                <div class="form-group">
-                    <label for="regEmail" class="form-label">Correo electrónico</label>
-                    <input type="email" id="regEmail" class="form-input" required>
-                    <div class="error-message" id="regEmailError"></div>
+                <div class="info-item">
+                    <i class="fas fa-check-circle" style="color: #20c997; font-size: 24px; margin-bottom: 10px;"></i>
+                    <h3>3. ¡Listo!</h3>
+                    <p>Tu cuenta estará activa y podrás acceder al sistema</p>
                 </div>
-                
-                <div class="form-group">
-                    <label for="regPassword" class="form-label">Contraseña</label>
-                    <div class="password-input-container">
-                        <input type="password" id="regPassword" class="form-input" required>
-                        <button type="button" class="password-toggle" id="regPasswordToggle">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="error-message" id="regPasswordError"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="regConfirmPassword" class="form-label">Confirmar contraseña</label>
-                    <div class="password-input-container">
-                        <input type="password" id="regConfirmPassword" class="form-input" required>
-                        <button type="button" class="password-toggle" id="regConfirmPasswordToggle">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="error-message" id="regConfirmPasswordError"></div>
-                </div>
-                
-                <button type="submit" class="register-button" id="registerButton">
-                    <span class="button-text">Crear Cuenta</span>
-                    <div class="spinner" style="display: none;">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </div>
-                </button>
-            </form>
-            
-            <div class="modal-footer">
-                <p>¿Ya tienes una cuenta? <a href="#" id="showLogin">Inicia sesión aquí</a></p>
             </div>
+            
+            <button class="modal-button" id="closeInfoButton">Entendido</button>
         </div>
     </div>
     
@@ -194,6 +157,245 @@
             <button class="modal-button" id="errorButton">Entendido</button>
         </div>
     </div>
+    
+    <style>
+        .info-content {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .info-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .info-item p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .info-button:hover {
+            color: #28a745 !important;
+        }
+    </style>
+    
+    <script>
+        // Funcionalidad para el modal de información
+        document.addEventListener('DOMContentLoaded', function() {
+            const infoModal = document.getElementById('infoModal');
+            const showInfoBtn = document.getElementById('showInfo');
+            const closeInfoBtn = document.getElementById('closeInfo');
+            const closeInfoButton = document.getElementById('closeInfoButton');
+            
+            // Mostrar modal
+            showInfoBtn.addEventListener('click', function() {
+                infoModal.style.display = 'block';
+            });
+            
+            // Cerrar modal
+            function closeModal() {
+                infoModal.style.display = 'none';
+            }
+            
+            closeInfoBtn.addEventListener('click', closeModal);
+            closeInfoButton.addEventListener('click', closeModal);
+            
+            // Cerrar al hacer clic fuera del modal
+            window.addEventListener('click', function(event) {
+                if (event.target === infoModal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+    
+    <script>
+        // Funcionalidad para el modal de información
+        document.addEventListener('DOMContentLoaded', function() {
+            const infoModal = document.getElementById('infoModal');
+            const showInfoBtn = document.getElementById('showInfo');
+            const closeInfoBtn = document.getElementById('closeInfo');
+            const closeInfoButton = document.getElementById('closeInfoButton');
+            
+            // Mostrar modal
+            showInfoBtn.addEventListener('click', function() {
+                infoModal.style.display = 'block';
+            });
+            
+            // Cerrar modal
+            function closeModal() {
+                infoModal.style.display = 'none';
+            }
+            
+            closeInfoBtn.addEventListener('click', closeModal);
+            closeInfoButton.addEventListener('click', closeModal);
+            
+            // Cerrar al hacer clic fuera del modal
+            window.addEventListener('click', function(event) {
+                if (event.target === infoModal) {
+                    closeModal();
+                }
+            });
+            
+            // Login manual mejorado
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginButton = document.getElementById('loginButton');
+            
+            // Verificar estado de bloqueo al escribir email
+            let blockCheckTimeout;
+            emailInput.addEventListener('input', function() {
+                clearTimeout(blockCheckTimeout);
+                const email = this.value.trim();
+                
+                if (email && email.includes('@')) {
+                    blockCheckTimeout = setTimeout(() => {
+                        checkBlockStatus(email);
+                    }, 1000);
+                }
+            });
+            
+            // Función para verificar estado de bloqueo
+            async function checkBlockStatus(email) {
+                try {
+                    const response = await fetch('/api/auth/check-block-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success && result.blocked) {
+                        showBlockedMessage(result.remaining_minutes, result.failed_attempts);
+                        loginButton.disabled = true;
+                    } else {
+                        hideBlockedMessage();
+                        loginButton.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error verificando estado de bloqueo:', error);
+                }
+            }
+            
+            // Mostrar mensaje de bloqueo
+            function showBlockedMessage(minutes, attempts) {
+                let blockedDiv = document.getElementById('blockedMessage');
+                if (!blockedDiv) {
+                    blockedDiv = document.createElement('div');
+                    blockedDiv.id = 'blockedMessage';
+                    blockedDiv.style.cssText = 'background: #dc3545; color: white; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;';
+                    loginForm.appendChild(blockedDiv);
+                }
+                
+                blockedDiv.innerHTML = `
+                    <i class="fas fa-lock"></i>
+                    <strong>Cuenta bloqueada temporalmente</strong><br>
+                    Demasiados intentos fallidos (${attempts}/5)<br>
+                    Intenta nuevamente en ${minutes} minutos
+                `;
+            }
+            
+            // Ocultar mensaje de bloqueo
+            function hideBlockedMessage() {
+                const blockedDiv = document.getElementById('blockedMessage');
+                if (blockedDiv) {
+                    blockedDiv.remove();
+                }
+            }
+            
+            // Manejar envío del formulario
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+                
+                if (!email || !password) {
+                    showError('Por favor completa todos los campos');
+                    return;
+                }
+                
+                // Mostrar loading
+                const buttonText = loginButton.querySelector('.button-text');
+                const spinner = loginButton.querySelector('.spinner');
+                
+                buttonText.textContent = 'Verificando...';
+                spinner.style.display = 'block';
+                loginButton.disabled = true;
+                
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showSuccess('Login exitoso. Redirigiendo...');
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 1500);
+                    } else {
+                        showError(result.error);
+                        
+                        // Si es error de contraseña, verificar estado de bloqueo
+                        if (response.status === 401 || response.status === 429) {
+                            checkBlockStatus(email);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error en login:', error);
+                    showError('Error de conexión. Inténtalo de nuevo.');
+                } finally {
+                    // Restaurar botón
+                    buttonText.textContent = 'Iniciar Sesión';
+                    spinner.style.display = 'none';
+                    loginButton.disabled = false;
+                }
+            });
+            
+            // Funciones para mostrar mensajes
+            function showError(message) {
+                const errorModal = document.getElementById('errorModal');
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = message;
+                errorModal.style.display = 'block';
+            }
+            
+            function showSuccess(message) {
+                const successModal = document.getElementById('successModal');
+                const successMessage = document.getElementById('successMessage');
+                successMessage.textContent = message;
+                successModal.style.display = 'block';
+            }
+            
+            // Cerrar modales de error y éxito
+            document.getElementById('errorButton').addEventListener('click', function() {
+                document.getElementById('errorModal').style.display = 'none';
+            });
+            
+            document.getElementById('successButton').addEventListener('click', function() {
+                document.getElementById('successModal').style.display = 'none';
+            });
+        });
+    </script>
     
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>

@@ -7,6 +7,7 @@ import json
 import logging
 from datetime import datetime, timedelta
 import requests
+import os
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -15,8 +16,9 @@ logger = logging.getLogger(__name__)
 # Crear Blueprint
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
-# Configuración temporal (luego se moverá a variables de entorno)
-GOOGLE_CLIENT_ID = 'demo'  # Cambiar por tu Google Client ID real
+# Configuración de Google OAuth (desde variables de entorno)
+# Asegúrate de definir GOOGLE_CLIENT_ID en /var/www/maruz/.env
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
 JWT_SECRET = 'maruz_jwt_secret_2024'  # Cambiar por una clave secreta real
 
 def verify_google_token(credential):
