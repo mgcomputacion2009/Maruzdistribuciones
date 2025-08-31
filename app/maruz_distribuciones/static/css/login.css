@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #031c88 0%, #221fca 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -78,13 +78,13 @@ body {
 
 .form-input:focus {
     outline: none;
-    border-color: #28a745;
+    border-color: #4285f4;
     background: white;
-    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
 }
 
 .login-button {
-    background: #28a745;
+    background: #4285f4;
     color: white;
     border: none;
     padding: 14px 24px;
@@ -97,7 +97,7 @@ body {
 }
 
 .login-button:hover {
-    background: #218838;
+    background: #3367d6;
     transform: translateY(-1px);
     box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
 }
@@ -310,13 +310,13 @@ body {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #28a745;
+    background: #4285f4;
     color: white;
     padding: 8px 12px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 8px rgba(66, 133, 244, 0.3);
 }
 
 .development-badge i {
@@ -328,7 +328,7 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    background: rgba(40, 167, 69, 0.9);
+    background: rgba(66, 133, 244, 0.9);
     color: white;
     padding: 12px 20px;
     border-radius: 25px;
@@ -344,7 +344,7 @@ body {
 }
 
 .back-home-btn:hover {
-    background: rgba(40, 167, 69, 1);
+    background: rgba(66, 133, 244, 1);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
 }

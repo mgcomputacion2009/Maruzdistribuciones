@@ -15,6 +15,8 @@ def home():
 def login():
     return render_template("login.html")
 
+
+
 @bp.route("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
