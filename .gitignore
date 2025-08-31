@@ -1,0 +1,60 @@
+# Variables de entorno
+.env
+.env.local
+.env.production
+.env.*
+!.env.example
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Logs
+*.log
+logs/
+logs_*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Base de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos de respaldo
+*.bak
+*.backup
+
+# Certificados y claves privadas
+*.pem
+*.key
+*.crt
+*.csr
+
+# Archivos temporales
+*.tmp
+temp/
+tmp/
+
+# Archivos de caché
+.cache/
+*.cache
+
+# Archivos de configuración sensibles
+config/credentials.py
+config/secrets.py

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Maruz Distribuciones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .company-name {
+            color: #28a745;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .development-info {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .card h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        .btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1 class="company-name">Maruz Distribuciones</h1>
+            <p>Panel de Control - Instancia de Desarrollo</p>
+            
+            <div class="development-info">
+                <strong>🔧 MODO DESARROLLO</strong><br>
+                Puerto 8002 | Base de datos compartida | Funcionalidades en desarrollo
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🔐 Autenticación</h3>
+                <p>Sistema de login y usuarios</p>
+                <a href="/login" class="btn">Ir a Login</a>
+            </div>
+            
+            <div class="card">
+                <h3>📦 Productos</h3>
+                <p>Gestión de inventario y catálogo</p>
+                <a href="/productos" class="btn">Ver Productos</a>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Reportes</h3>
+                <p>Análisis y estadísticas</p>
+                <a href="#" class="btn" onclick="alert('En desarrollo')">Próximamente</a>
+            </div>
+            
+            <div class="card">
+                <h3>⚙️ Configuración</h3>
+                <p>Ajustes del sistema</p>
+                <a href="#" class="btn" onclick="alert('En desarrollo')">Próximamente</a>
+            </div>
+        </div>
+        
+        <div class="development-info" style="margin-top: 40px; text-align: center;">
+            <h4>🎯 Estado del Proyecto Multi-Empresa</h4>
+            <p><strong>Producción:</strong> Maruz Distributions Corp (Puerto 5000) ✅</p>
+            <p><strong>Desarrollo:</strong> Maruz Distribuciones (Puerto 8002) 🚧</p>
+            <p><strong>Base de Datos:</strong> Compartida entre ambas instancias</p>
+        </div>
+    </div>
+</body>
+</html>

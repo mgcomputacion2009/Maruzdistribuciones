@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Maruz Distribuciones</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Company Logo -->
+        <img src="{{ url_for('static', filename='images/maruz-logo-distribuciones.png') }}" 
+             alt="Maruz Distribuciones Logo" 
+             class="company-logo"
+             onerror="this.style.display='none'">
+        
+        <!-- Login Title -->
+        <h1 class="login-title">Bienvenido de nuevo</h1>
+        <p class="login-subtitle">Inicia sesión en tu cuenta para continuar</p>
+        
+        <!-- Login Form -->
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" 
+                       id="email" 
+                       class="form-input" 
+                       placeholder="Ingresa tu correo"
+                       required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" 
+                       id="password" 
+                       class="form-input" 
+                       placeholder="Ingresa tu contraseña"
+                       required>
+            </div>
+            
+            <button type="submit" class="login-button">
+                <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+                Iniciar Sesión
+            </button>
+        </form>
+        
+        <!-- Divider -->
+        <div class="divider">o continúa con</div>
+        
+        <!-- Social Login Buttons -->
+        <div class="social-buttons">
+            <button class="social-button google-button">
+                <i class="fab fa-google"></i>
+                Continuar con Google
+            </button>
+            
+            <button class="social-button apple-button">
+                <i class="fab fa-apple"></i>
+                Continuar con Apple
+            </button>
+            
+            <button class="social-button facebook-button">
+                <i class="fab fa-facebook-f"></i>
+                Continuar con Facebook
+            </button>
+        </div>
+        
+        <!-- Development Badge -->
+        <div class="development-badge">
+            <i class="fas fa-code"></i> DESARROLLO - Puerto 8002
+        </div>
+        
+        <!-- Back to Home Button -->
+        <a href="/" class="back-home-btn">
+            <i class="fas fa-arrow-left"></i> Volver al Inicio
+        </a>
+    </div>
+    
+    <!-- Development Modal -->
+    <div id="developmentModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            
+            <div class="modal-icon">
+                <i class="fas fa-cog loading-gear"></i>
+            </div>
+            
+            <h2 class="modal-title">En Desarrollo</h2>
+            <p class="modal-text">
+                Estamos trabajando en esta funcionalidad. 
+                Nuestro equipo de desarrollo está construyendo algo increíble para ti. 
+                ¡Vuelve pronto!
+            </p>
+            
+            <button class="modal-button">Entendido</button>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

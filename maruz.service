@@ -1,0 +1,21 @@
+[Unit]
+Description=Aplicación Flask Maruz con Gunicorn
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+RuntimeDirectory=maruz
+WorkingDirectory=/var/www/maruz
+Environment=PATH=/var/www/maruz/venv/bin
+ExecStart=/var/www/maruz/venv/bin/gunicorn --config gunicorn_config.py wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

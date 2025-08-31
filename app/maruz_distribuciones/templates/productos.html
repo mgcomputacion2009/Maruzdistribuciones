@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Productos - Maruz Distribuciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #031c88 0%, #221fca 100%); min-height: 100vh; padding: 16px; }
+        .container { max-width: 1280px; margin: 0 auto; background: #fff; padding: 16px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,.08); width: 100%; }
+        .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .title { color: #4285f4; font-size: 1.4rem; font-weight: 700; }
+        .search { flex: 1 1 300px; display: flex; gap: 8px; max-width: 100%; }
+        .search input { width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; outline: none; font-size: 13px; min-width: 0; }
+        .search button { background: #4285f4; color: #fff; border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .search button:hover { background: #3367d6; }
+        .info { color: #6b7280; font-size: 12px; margin: 4px 0 10px; }
+
+        /* Lista compacta */
+        .list { display: grid; gap: 6px; max-width: 100%; }
+        .row { display: grid; grid-template-columns: 56px 1fr auto; gap: 10px; align-items: center; border: 1px solid #f0f2f5; border-radius: 10px; padding: 8px; width: 100%; max-width: 100%; overflow: hidden; }
+        .thumb { width: 56px; height: 56px; border-radius: 8px; background: #f9fafb; display: grid; place-items: center; overflow: hidden; }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; display:block; }
+        .main { display: grid; gap: 2px; }
+        .code { font-size: 12px; color: #6b7280; }
+        .desc { font-size: 13px; font-weight: 600; color: #111827; line-height: 1.2; }
+        .cat { font-size: 11px; color: #9ca3af; }
+        .actions { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 100%; }
+        .qtywrap { display: flex; align-items: center; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; flex: 0 0 auto; width: fit-content; max-width: 120px; justify-content: space-between; }
+        .qtybtn { width: 28px; height: 28px; display: grid; place-items: center; background: #f8fafc; color: #111827; border: 0; cursor: pointer; flex: 0 0 28px; flex-shrink: 0; box-sizing: border-box; }
+        .qty { width: 40px; height: 28px; padding: 0 4px; font-size: 12px; border: 0; text-align: center; outline: none; flex: 0 0 40px; flex-shrink: 0; box-sizing: border-box; }
+        /* Eliminar spinners nativos que rompen ancho en móviles */
+        .qty::-webkit-outer-spin-button, .qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .qty { -moz-appearance: textfield; }
+        .price { font-size: 12px; color: #111827; min-width: 60px; text-align: right; overflow: hidden; text-overflow: ellipsis; }
+        .discount { width: 64px; padding: 6px; font-size: 12px; border: 1px solid #e5e7eb; border-radius: 8px; text-align: right; }
+        .total { font-size: 12px; font-weight: 700; color: #16a34a; min-width: 72px; text-align: right; overflow: hidden; text-overflow: ellipsis; }
+        .pdf-link { color: #dc2626; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; }
+        .pdf-link:hover { text-decoration: underline; }
+        .pdf-disabled { opacity: .4; cursor: not-allowed; }
+
+        /* Panel expandible */
+        .details { display: none; padding: 8px 8px 12px 74px; color: #374151; font-size: 12px; }
+        .row.expanded + .details { display: block; }
+        .more { color: #0284c7; cursor: pointer; font-size: 12px; }
+
+        /* Barra de resumen de compra en cabecera */
+        .summary-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .summary-info {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .summary-label {
+            font-size: 11px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        .summary-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
+        .summary-total {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Botón de carrito flotante */
+        .floating-cart {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        .floating-cart:hover {
+            background: #b91c1c;
+            transform: translateY(-4px) scale(1.1);
+            box-shadow: 0 12px 32px rgba(220, 38, 38, 0.5);
+        }
+        .floating-cart:active {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* Ajustar el contenedor principal para la barra fija */
+        .container {
+            margin-top: 80px;
+        }
+
+        .pager { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+        .pager a, .pager span { padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; font-size: 12px; }
+        .pager a:hover { background: #f3f4f6; }
+
+        /* Responsive móvil: apilar acciones y hacer sticky los controles laterales si hay poco ancho */
+        @media (max-width: 430px){
+            .row { grid-template-columns: 48px 1fr; align-items: start; }
+            .thumb { width: 48px; height: 48px; }
+            .actions { grid-column: 1 / -1; display: grid; grid-template-columns: auto auto auto; grid-template-areas: 'qty disc pdf' 'price total total' 'more more more'; gap: 6px; padding-left: 58px; align-items: center; max-width: 100%; justify-items:start; }
+            .qtybtn { width: 24px; height: 24px; flex-basis: 24px; flex-shrink: 0; }
+            .qty { width: 34px; height: 24px; flex-basis: 34px; flex-shrink: 0; }
+            .qtywrap { grid-area: qty; width: 100%; max-width: 100px; display: flex; justify-content: space-between; }
+            .discount { grid-area: disc; width: 54px; }
+            .pdf-link, .pdf-disabled { grid-area: pdf; justify-self: end; }
+            .price { grid-area: price; min-width: auto; }
+            .total { grid-area: total; min-width: auto; justify-self: end; }
+            .more { grid-area: more; }
+            
+            /* Responsive para la barra de resumen */
+            .summary-bar {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+            .summary-info {
+                gap: 12px;
+                justify-content: space-around;
+            }
+            .summary-item {
+                flex: 1;
+                min-width: 0;
+            }
+            .summary-label {
+                font-size: 9px;
+            }
+            .summary-value {
+                font-size: 12px;
+            }
+            .summary-total {
+                font-size: 14px;
+            }
+            
+            /* Responsive para el carrito flotante */
+            .floating-cart {
+                bottom: 16px;
+                right: 16px;
+                width: 56px;
+                height: 56px;
+                font-size: 20px;
+            }
+            
+            /* Responsive para el popup de galería */
+            .gallery-popup {
+                padding: 10px !important;
+            }
+            .gallery-header h2 {
+                font-size: 18px !important;
+            }
+            .gallery-main {
+                height: 50vh !important;
+                margin-bottom: 15px !important;
+            }
+            .gallery-thumbs {
+                gap: 8px !important;
+                padding: 8px !important;
+            }
+            .gallery-thumb {
+                width: 60px !important;
+                height: 60px !important;
+            }
+            
+            /* Ajustar margen superior en móvil */
+            .container {
+                margin-top: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Productos</div>
+            <form class="search" action="/productos" method="get">
+                <input type="text" name="q" placeholder="Buscar por código, descripción o categoría" value="{{ q or '' }}" />
+                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i>&nbsp;Buscar</button>
+            </form>
+        </div>
+
+        <div class="info">
+            {% set mostrados = productos|length %}
+            Mostrando {{ mostrados }} de {{ total or mostrados }}
+        </div>
+
+        <!-- Barra de resumen de compra -->
+        <div class="summary-bar" id="summaryBar">
+            <div class="summary-info">
+                <div class="summary-item">
+                    <div class="summary-label">Productos</div>
+                    <div class="summary-value" id="totalProducts">0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Subtotal</div>
+                    <div class="summary-value" id="subtotal">$0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total con descuento</div>
+                    <div class="summary-value summary-total" id="totalWithDiscount">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón de carrito flotante -->
+        <button class="floating-cart" onclick="procesarCompra()" title="Procesar Compra">
+            <i class="fa-solid fa-shopping-cart"></i>
+        </button>
+
+        <div class="list" id="list">
+            {% for p in productos %}
+            <div class="row" onclick="toggleRow(this)">
+                <div class="thumb"><img src="{{ p.img_url }}&v={{ v }}" alt="{{ p.codigo }}" loading="lazy" /></div>
+                <div class="main">
+                    <div class="desc">{{ p.descripcion }}</div>
+                    <div class="code"># {{ p.codigo }}</div>
+                    {% if p.categoria %}<div class="cat">{{ p.categoria }}</div>{% endif %}
+                </div>
+                <div class="actions" onclick="event.stopPropagation()">
+                    <div class="qtywrap" onclick="event.stopPropagation()">
+                        <button class="qtybtn" onclick="stepQty(this,-1)">-</button>
+                        <input class="qty" type="number" inputmode="numeric" min="0" step="1" value="0" oninput="recalc(this)" title="Cantidad" />
+                        <button class="qtybtn" onclick="stepQty(this,1)">+</button>
+                    </div>
+                    <div class="price" title="Precio">$ {{ '%.2f' % (p.precio or 0) }}</div>
+                    <input class="discount" type="number" inputmode="decimal" min="0" step="0.01" max="100" placeholder="%" oninput="recalc(this)" onclick="event.stopPropagation()" title="% Desc" />
+                    <div class="total" title="Total">$ 0.00</div>
+                    {% if p.web_url %}
+                    <a class="pdf-link" href="{{ p.web_url }}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Abrir PDF"><i class="fa-regular fa-file-pdf"></i></a>
+                    {% else %}
+                    <span class="pdf-disabled" title="Sin PDF"><i class="fa-regular fa-file-pdf"></i></span>
+                    {% endif %}
+                    <span class="more" onclick="toggleParentRow(this)">Ver más</span>
+                </div>
+            </div>
+            <div class="details">
+                {% if p.descripcion_producto %}<div style="margin-bottom:6px"><strong>Descripción:</strong> {{ p.descripcion_producto }}</div>{% endif %}
+                {% if p.campos_aplicacion %}<div style="margin-bottom:6px"><strong>Aplicaciones:</strong> {{ p.campos_aplicacion }}</div>{% endif %}
+                <div>
+                    <a class="more" href="#" onclick="openGallery(event, {{ p.imagenes|tojson }}, '{{ p.descripcion|e }}')">Ver imágenes</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% set prev_page = page - 1 if page and page > 1 else None %}
+        {% set next_page = page + 1 if total and (page * limit) < total else None %}
+        <div class="pager">
+            {% if prev_page %}
+                <a href="/productos?q={{ q }}&page={{ prev_page }}&limit={{ limit }}">Anterior</a>
+            {% else %}
+                <span>Anterior</span>
+            {% endif %}
+            {% if next_page %}
+                <a href="/productos?q={{ q }}&page={{ next_page }}&limit={{ limit }}">Siguiente</a>
+            {% else %}
+                <span>Siguiente</span>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <script>
+        function toggleRow(el){
+            if(el.classList.contains('expanded')){ el.classList.remove('expanded'); return; }
+            // Contraer otras
+            document.querySelectorAll('.row.expanded').forEach(r=>r.classList.remove('expanded'));
+            el.classList.add('expanded');
+        }
+
+        function toggleParentRow(span){
+            const row = span.closest('.row');
+            if(!row) return;
+            toggleRow(row);
+        }
+
+        function getRow(el){ return el.closest('.row'); }
+
+        function recalc(el){
+            const row = el.closest('.row');
+            const qty = parseFloat(row.querySelector('.qty').value || '0');
+            const price = parseFloat(row.querySelector('.price').textContent.replace(/[^0-9.]/g,'') || '0');
+            const disc = parseFloat(row.querySelector('.discount').value || '0');
+            const total = Math.max(0, qty * price * (1 - disc/100));
+            row.querySelector('.total').textContent = '$ ' + total.toFixed(2);
+            
+            // Actualizar barra de resumen
+            updateSummaryBar();
+        }
+
+        function stepQty(btn, delta){
+            const row = getRow(btn);
+            const input = row.querySelector('.qty');
+            let v = parseInt(input.value||'0',10) + delta;
+            if(isNaN(v) || v < 0) v = 0;
+            input.value = v;
+            recalc(input);
+        }
+
+        // Función para actualizar la barra de resumen
+        function updateSummaryBar() {
+            let totalProducts = 0;
+            let subtotal = 0;
+            let totalWithDiscount = 0;
+
+            // Recorrer todas las filas de productos
+            document.querySelectorAll('.row').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty').value || '0');
+                const price = parseFloat(row.querySelector('.price').textContent.replace(/[^0-9.]/g,'') || '0');
+                const discount = parseFloat(row.querySelector('.discount').value || '0');
+                
+                if (qty > 0) {
+                    totalProducts++;
+                    subtotal += qty * price;
+                    totalWithDiscount += qty * price * (1 - discount/100);
+                }
+            });
+
+            // Actualizar los valores en la barra
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('totalWithDiscount').textContent = '$' + totalWithDiscount.toFixed(2);
+        }
+
+        // Función para procesar la compra
+        function procesarCompra() {
+            const totalProducts = document.getElementById('totalProducts').textContent;
+            const totalAmount = document.getElementById('totalWithDiscount').textContent;
+            
+            if (totalProducts === '0') {
+                alert('No hay productos seleccionados para comprar');
+                return;
+            }
+
+            // Aquí puedes agregar la lógica para procesar la compra
+            // Por ejemplo, enviar a un endpoint, mostrar un modal de confirmación, etc.
+            alert(`Procesando compra:\nProductos: ${totalProducts}\nTotal: ${totalAmount}`);
+        }
+
+        // Modal de galería profesional en pantalla completa
+        function openGallery(ev, images, title){
+            ev.preventDefault();
+            ev.stopPropagation();
+            
+            console.log('openGallery llamado con:', {images, title}); // Debug
+            
+            if(!images || !images.length){ 
+                console.log('No hay imágenes para mostrar');
+                alert('No hay imágenes disponibles para este producto');
+                return; 
+            }
+            
+            // Crear overlay de pantalla completa
+            const overlay = document.createElement('div');
+            overlay.id = 'galleryOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.95);
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            // Header con título y botón cerrar
+            const header = document.createElement('div');
+            header.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                max-width: 1200px;
+                margin-bottom: 20px;
+                color: white;
+            `;
+            header.innerHTML = `
+                <h2 style="margin:0; font-size: 24px; font-weight: 600;">${title || 'Producto'}</h2>
+                <button id="closeBtn" style="
+                    border: 0;
+                    background: #ef4444;
+                    color: white;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    cursor: pointer;
+                    font-size: 18px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">×</button>
+            `;
+            
+            // Imagen principal (pantalla completa)
+            const mainContainer = document.createElement('div');
+            mainContainer.style.cssText = `
+                width: 100%;
+                max-width: 1200px;
+                height: 70vh;
+                background: #000;
+                border-radius: 12px;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+            `;
+            
+            const mainImg = document.createElement('img');
+            mainImg.src = images[0];
+            mainImg.style.cssText = `
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                border-radius: 8px;
+            `;
+            mainContainer.appendChild(mainImg);
+            
+            // Contenedor de miniaturas
+            const thumbsContainer = document.createElement('div');
+            thumbsContainer.style.cssText = `
+                display: flex;
+                gap: 12px;
+                overflow-x: auto;
+                padding: 10px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 12px;
+                max-width: 1200px;
+                width: 100%;
+                box-sizing: border-box;
+            `;
+            
+            // Crear miniaturas
+            images.forEach((src, index) => {
+                const thumb = document.createElement('div');
+                thumb.style.cssText = `
+                    flex-shrink: 0;
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    cursor: pointer;
+                    border: 3px solid ${index === 0 ? '#4285f4' : 'transparent'};
+                    background: #333;
+                `;
+                
+                const thumbImg = document.createElement('img');
+                thumbImg.src = src;
+                thumbImg.style.cssText = `
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                `;
+                
+                // Click en miniatura
+                thumb.onclick = () => {
+                    mainImg.src = src;
+                    // Actualizar borde activo
+                    thumbsContainer.querySelectorAll('div').forEach((t, i) => {
+                        t.style.borderColor = i === index ? '#4285f4' : 'transparent';
+                    });
+                };
+                
+                thumb.appendChild(thumbImg);
+                thumbsContainer.appendChild(thumb);
+            });
+            
+            // Botón cerrar
+            header.querySelector('#closeBtn').onclick = () => {
+                closeGallery();
+            };
+            
+            // Cerrar con ESC
+            const closeOnEsc = (e) => {
+                if (e.key === 'Escape') {
+                    closeGallery();
+                    document.removeEventListener('keydown', closeOnEsc);
+                }
+            };
+            document.addEventListener('keydown', closeOnEsc);
+            
+            // Cerrar con click en overlay
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closeGallery();
+                }
+            });
+            
+            // Función para cerrar
+            function closeGallery() {
+                if (document.getElementById('galleryOverlay')) {
+                    document.body.removeChild(overlay);
+                    document.body.style.overflow = '';
+                }
+            }
+            
+            // Ensamblar modal
+            overlay.appendChild(header);
+            overlay.appendChild(mainContainer);
+            overlay.appendChild(thumbsContainer);
+            
+            // Agregar al DOM
+            document.body.appendChild(overlay);
+            
+            // Prevenir scroll del body
+            document.body.style.overflow = 'hidden';
+            
+            console.log('Popup creado exitosamente'); // Debug
+        }
+
+        // Inicializar la barra de resumen cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSummaryBar();
+        });
+    </script>
+</body>
+</html>

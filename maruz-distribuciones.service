@@ -1,0 +1,36 @@
+[Unit]
+Description=Maruz Distribuciones - Servicio de Desarrollo
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=mercadeo
+Group=mercadeo
+WorkingDirectory=/var/www/maruz
+Environment=PATH=/var/www/maruz/venv/bin
+Environment=FLASK_ENV=development
+Environment=FLASK_DEBUG=1
+ExecStart=/var/www/maruz/venv/bin/python /var/www/maruz/run_maruz_distribuciones.py
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=10
+PrivateTmp=true
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+StartLimitBurst=0
+
+# Configuración de logs
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=maruz-distribuciones
+
+# Configuración de seguridad
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/maruz
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,51 @@
+========================================
+     MANUAL RAPIDO - PROTOCOLO MARUZ
+========================================
+
+🚀 INICIO DE SESION
+------------------
+"Activar protocolo Maruz - Verificar estado actual del proyecto"
+→ Activa verificacion automatica del estado completo
+
+💾 GUARDAR PROGRESO
+------------------
+Cambio Pequeño:
+"Checkpoint: [descripcion breve]"
+→ Guarda cambio menor en bitacoras
+
+Funcionalidad Completa:
+"Guardar hito: [descripcion del logro]"
+→ Documenta funcionalidad terminada
+
+Cambio Estructural:
+"Backup completo: [descripcion]"
+→ Respaldo de cambios criticos del sistema
+
+🛡️ EMERGENCIAS
+--------------
+Diagnostico:
+"Diagnostico completo - revisar todas las configuraciones"
+→ Revisa todo si algo no funciona
+
+Volver Atras:
+"Restaurar al ultimo checkpoint estable"
+→ Regresa al ultimo estado funcionando
+
+Cambiar Objetivo:
+"Cambio de direccion: [nuevo objetivo]"
+→ Cambia el plan de desarrollo actual
+
+📋 FORMATO COMPLETO DE INICIO
+-----------------------------
+Activar protocolo Maruz - Verificar estado actual del proyecto
+
+Objetivo de hoy: [lo que quieres desarrollar]
+
+========================================
+Puerto 5000: Maruz Distributions Corp (PRODUCCION)
+Puerto 8002: Maruz Distribuciones (DESARROLLO)
+IP: 34.57.121.200
+========================================
+Proyecto: Maruz Multi-Company System
+Version: 1.0 - Stable
+========================================
