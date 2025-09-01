@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completar Perfil - Maruz Distribuciones</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Company Logo -->
+        <img src="{{ url_for('static', filename='images/maruz-logo-distribuciones.png') }}" 
+             alt="Maruz Distribuciones Logo" 
+             class="company-logo"
+             onerror="this.style.display='none'">
+        
+        <!-- Welcome Title -->
+        <h1 class="login-title">Completar Perfil</h1>
+        <p class="login-subtitle">Necesitamos algunos datos adicionales para crear tu cuenta</p>
+        
+        <!-- Profile Completion Form -->
+        <form id="completeProfileForm" class="login-form">
+            <div class="form-group">
+                <label for="nombre" class="form-label">Nombre *</label>
+                <input type="text" 
+                       id="nombre" 
+                       name="nombre"
+                       class="form-input" 
+                       placeholder="Tu nombre real"
+                       value="{{ user.name or '' }}"
+                       required>
+                <div class="error-message" id="nombreError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="apellido" class="form-label">Apellido *</label>
+                <input type="text" 
+                       id="apellido" 
+                       name="apellido"
+                       class="form-input" 
+                       placeholder="Tu apellido real"
+                       required>
+                <div class="error-message" id="apellidoError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono" class="form-label">Número de Teléfono *</label>
+                <input type="tel" 
+                       id="telefono" 
+                       name="telefono"
+                       class="form-input" 
+                       placeholder="+34 600 000 000"
+                       required>
+                <div class="error-message" id="telefonoError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="whatsapp" class="form-label">Número de WhatsApp *</label>
+                <input type="tel" 
+                       id="whatsapp" 
+                       name="whatsapp"
+                       class="form-input" 
+                       placeholder="+34 600 000 000"
+                       required>
+                <div class="error-message" id="whatsappError"></div>
+            </div>
+            
+            <div class="form-group" style="display: none;">
+                <label for="rol" class="form-label">Tipo de Usuario</label>
+                <input type="hidden" id="rol" name="rol" value="cliente">
+                <p style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <i class="fas fa-info-circle"></i> 
+                    Tu tipo de usuario será asignado por el administrador
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña *</label>
+                <input type="password" 
+                       id="password" 
+                       name="password"
+                       class="form-input" 
+                       placeholder="Crea una contraseña segura"
+                       required>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirmar Contraseña *</label>
+                <input type="password" 
+                       id="confirm_password" 
+                       name="confirm_password"
+                       class="form-input" 
+                       placeholder="Repite tu contraseña"
+                       required>
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+            
+            <button type="submit" class="login-button" id="submitButton">
+                <i class="fas fa-user-plus" style="margin-right: 8px;"></i>
+                <span class="button-text">Crear Cuenta</span>
+                <div class="spinner" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </button>
+        </form>
+        
+        <!-- Development Badge -->
+        <div class="development-badge">
+            <i class="fas fa-code"></i> DESARROLLO - Puerto 8002
+        </div>
+    </div>
+    
+    <script>
+        console.log('Script de completar perfil cargado');
+        
+        document.getElementById('completeProfileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Formulario enviado');
+            
+            // Limpiar errores previos
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            
+            // Validar campos requeridos
+            const nombre = document.getElementById('nombre').value.trim();
+            const apellido = document.getElementById('apellido').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (!nombre || !apellido || !telefono || !whatsapp || !password) {
+                alert('Por favor completa todos los campos requeridos');
+                return;
+            }
+            
+            // Validar contraseñas
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Las contraseñas no coinciden';
+                return;
+            }
+            
+            if (password.length < 6) {
+                document.getElementById('passwordError').textContent = 'La contraseña debe tener al menos 6 caracteres';
+                return;
+            }
+            
+            const submitButton = document.getElementById('submitButton');
+            const spinner = submitButton.querySelector('.spinner');
+            const buttonText = submitButton.querySelector('.button-text');
+            
+            // Mostrar loading
+            spinner.style.display = 'block';
+            buttonText.textContent = 'Creando cuenta...';
+            submitButton.disabled = true;
+            
+            try {
+                const data = {
+                    nombre: nombre,
+                    apellido: apellido,
+                    telefono: telefono,
+                    whatsapp: whatsapp,
+                    rol: 'cliente', // Siempre cliente por defecto
+                    password: password,
+                    email: '{{ user.email }}',
+                    google_id: '{{ user.sub }}'
+                };
+                
+                console.log('Enviando datos:', data);
+                console.log('URL de la API:', '/api/auth/complete-profile');
+                
+                const response = await fetch('/api/auth/complete-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('Respuesta recibida:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('Resultado:', result);
+                
+                if (result.success) {
+                    alert('¡Cuenta creada exitosamente! Redirigiendo a la página de inicio...');
+                    // Redirigir a la página de inicio
+                    if (result.redirect_url) {
+                        window.location.href = result.redirect_url;
+                    } else {
+                        window.location.href = '/';
+                    }
+                } else {
+                    alert('Error: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error completo:', error);
+                alert('Error al crear la cuenta: ' + error.message);
+            } finally {
+                // Restaurar botón
+                spinner.style.display = 'none';
+                buttonText.textContent = 'Crear Cuenta';
+                submitButton.disabled = false;
+            }
+        });
+        
+        // Agregar listener para debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM cargado completamente');
+            console.log('Formulario encontrado:', document.getElementById('completeProfileForm'));
+            console.log('Botón encontrado:', document.getElementById('submitButton'));
+        });
+    </script>
+</body>
+</html>
