@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Frontend Ranking - Maruz</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background: #f9f9f9;
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            cursor: pointer; 
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+        }
+        button:hover { background: #0056b3; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test Frontend Ranking - Maruz</h1>
+        
+        <div class="test-section">
+            <h3>1. Configuración de Usuario</h3>
+            <label>Cliente ID de prueba:</label>
+            <input type="number" id="clienteIdTest" value="1" min="1" max="10">
+            <button onclick="updateClientId()">Actualizar Cliente ID</button>
+            <div id="clienteStatus" class="status info">
+                Cliente ID actual: <span id="currentClientId">No definido</span>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Simulador de Búsquedas</h3>
+            <input type="text" id="searchQuery" placeholder="Escribe tu búsqueda (ej: aceite)" value="aceite">
+            <button onclick="testSearch()">🔍 Hacer Búsqueda</button>
+            <button onclick="testMultipleSearches()">🔄 Múltiples Búsquedas</button>
+            <div id="searchResults" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Verificación de Ranking</h3>
+            <button onclick="checkRanking()">📊 Verificar Ranking en BD</button>
+            <button onclick="testWithDifferentUsers()">👥 Probar con Diferentes Usuarios</button>
+            <div id="rankingResults" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Logs del Sistema</h3>
+            <button onclick="clearLogs()">🧹 Limpiar Logs</button>
+            <div id="systemLogs" style="background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                Logs del sistema aparecerán aquí...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simular window.userId como en la página real
+        window.userId = null;
+        
+        // Función para actualizar el cliente ID
+        function updateClientId() {
+            const newClientId = document.getElementById('clienteIdTest').value;
+            window.userId = parseInt(newClientId);
+            document.getElementById('currentClientId').textContent = window.userId;
+            
+            addLog(`✅ Cliente ID actualizado a: ${window.userId}`);
+        }
+        
+        // Función para hacer una búsqueda de prueba
+        async function testSearch() {
+            const query = document.getElementById('searchQuery').value.trim();
+            const status = document.getElementById('searchResults');
+            
+            if (!query) {
+                status.innerHTML = '<div class="error">❌ Ingresa una búsqueda</div>';
+                return;
+            }
+            
+            if (!window.userId) {
+                status.innerHTML = '<div class="error">❌ Primero configura un Cliente ID</div>';
+                return;
+            }
+            
+            status.innerHTML = '<div class="info">🔄 Realizando búsqueda...</div>';
+            addLog(`🔍 Iniciando búsqueda: "${query}" con cliente ID: ${window.userId}`);
+            
+            try {
+                // Simular la misma lógica del frontend original
+                const url = `/api/autocomplete?q=${encodeURIComponent(query)}&cliente_id=${window.userId}`;
+                addLog(`📡 URL: ${url}`);
+                
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    status.innerHTML = `
+                        <div class="success">
+                            ✅ Búsqueda exitosa<br>
+                            📦 Productos encontrados: ${data.length}<br>
+                            🎯 Productos que se registrarán: ${Math.min(data.length, 5)}<br>
+                            👤 Cliente ID enviado: ${window.userId}
+                        </div>
+                    `;
+                    
+                    addLog(`✅ Respuesta exitosa: ${data.length} productos encontrados`);
+                    
+                    if (data.length > 0) {
+                        addLog(`📋 Primeros productos: ${data.slice(0, 3).map(p => p.codigo).join(', ')}`);
+                    }
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                addLog(`❌ Error en búsqueda: ${error.message}`);
+            }
+        }
+        
+        // Función para múltiples búsquedas
+        async function testMultipleSearches() {
+            const queries = ['aceite', 'bujia', 'filtro', '5W', 'aceite']; // Repetir aceite para frecuencia
+            const status = document.getElementById('searchResults');
+            
+            if (!window.userId) {
+                status.innerHTML = '<div class="error">❌ Primero configura un Cliente ID</div>';
+                return;
+            }
+            
+            status.innerHTML = '<div class="info">🔄 Ejecutando múltiples búsquedas...</div>';
+            addLog(`🚀 Iniciando ${queries.length} búsquedas múltiples`);
+            
+            for (let i = 0; i < queries.length; i++) {
+                const query = queries[i];
+                addLog(`📍 Búsqueda ${i + 1}/${queries.length}: "${query}"`);
+                
+                try {
+                    const url = `/api/autocomplete?q=${encodeURIComponent(query)}&cliente_id=${window.userId}`;
+                    const response = await fetch(url);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        addLog(`✅ "${query}": ${data.length} productos`);
+                    } else {
+                        addLog(`❌ "${query}": Error ${response.status}`);
+                    }
+                    
+                    // Esperar 1 segundo entre búsquedas
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                } catch (error) {
+                    addLog(`❌ "${query}": ${error.message}`);
+                }
+            }
+            
+            status.innerHTML = '<div class="success">✅ Múltiples búsquedas completadas. Revisa los logs.</div>';
+            addLog(`🎉 Búsquedas múltiples completadas`);
+        }
+        
+        // Función para verificar ranking en BD
+        async function checkRanking() {
+            const status = document.getElementById('rankingResults');
+            
+            if (!window.userId) {
+                status.innerHTML = '<div class="error">❌ Primero configura un Cliente ID</div>';
+                return;
+            }
+            
+            status.innerHTML = '<div class="info">🔄 Verificando ranking en BD...</div>';
+            addLog(`📊 Verificando ranking para cliente ${window.userId}`);
+            
+            try {
+                // Usar el script de prueba simple
+                const response = await fetch('/test_ranking_simple.py', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cliente_id: window.userId })
+                });
+                
+                // Como no podemos ejecutar Python directamente, simular verificación
+                status.innerHTML = `
+                    <div class="info">
+                        📊 Para verificar el ranking:<br>
+                        1. Ejecuta en terminal: <code>python3 test_ranking_simple.py</code><br>
+                        2. O verifica directamente en la BD los registros recientes<br>
+                        3. Busca registros del cliente ${window.userId} en los últimos minutos
+                    </div>
+                `;
+                
+                addLog(`📋 Instrucciones de verificación mostradas`);
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                addLog(`❌ Error verificando ranking: ${error.message}`);
+            }
+        }
+        
+        // Función para probar con diferentes usuarios
+        async function testWithDifferentUsers() {
+            const status = document.getElementById('rankingResults');
+            const users = [1, 2, 3, 4, 5];
+            
+            status.innerHTML = '<div class="info">🔄 Probando con diferentes usuarios...</div>';
+            addLog(`👥 Probando con usuarios: ${users.join(', ')}`);
+            
+            for (const userId of users) {
+                addLog(`👤 Probando con usuario ${userId}...`);
+                
+                try {
+                    const url = `/api/autocomplete?q=aceite&cliente_id=${userId}`;
+                    const response = await fetch(url);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        addLog(`✅ Usuario ${userId}: ${data.length} productos encontrados`);
+                    } else {
+                        addLog(`❌ Usuario ${userId}: Error ${response.status}`);
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                } catch (error) {
+                    addLog(`❌ Usuario ${userId}: ${error.message}`);
+                }
+            }
+            
+            status.innerHTML = '<div class="success">✅ Pruebas con diferentes usuarios completadas</div>';
+            addLog(`🎉 Pruebas con usuarios completadas`);
+        }
+        
+        // Función para agregar logs
+        function addLog(message) {
+            const logsContainer = document.getElementById('systemLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            logsContainer.innerHTML += logEntry + '\n';
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+        
+        // Función para limpiar logs
+        function clearLogs() {
+            document.getElementById('systemLogs').innerHTML = 'Logs limpiados...\n';
+        }
+        
+        // Inicializar
+        window.addEventListener('load', () => {
+            updateClientId(); // Configurar cliente ID inicial
+            addLog('🧪 Test Frontend Ranking inicializado');
+        });
+    </script>
+</body>
+</html>

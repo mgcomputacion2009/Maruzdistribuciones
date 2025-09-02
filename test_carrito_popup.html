@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Carrito Popup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Inter', Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .test-section { 
+            margin: 25px 0; 
+            padding: 20px; 
+            border: 1px solid #e1e5e9; 
+            border-radius: 10px; 
+            background: #f8f9fa;
+        }
+        .test-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { 
+            padding: 12px 20px; 
+            margin: 8px; 
+            cursor: pointer; 
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        input { 
+            padding: 10px; 
+            margin: 8px; 
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background-color: #27ae60; }
+        .status-offline { background-color: #e74c3c; }
+        .status-loading { background-color: #f39c12; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test del Carrito Popup</h1>
+        <p style="color: #666; margin-bottom: 30px;">
+            Sistema de popup completamente separado para el carrito de compras
+        </p>
+        
+        <div class="test-section">
+            <h3>1. Estado del Sistema</h3>
+            <div id="status">
+                <span class="status-indicator status-loading"></span>
+                Verificando estado del carrito popup...
+            </div>
+            <button class="btn-primary" onclick="checkStatus()">🔄 Verificar Estado</button>
+            <button class="btn-warning" onclick="resetCarrito()">🔄 Resetear Carrito</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Test de Endpoints</h3>
+            <button class="btn-primary" onclick="testEnsure()">🔐 Test Ensure</button>
+            <button class="btn-primary" onclick="testResumen()">📊 Test Resumen</button>
+            <button class="btn-primary" onclick="testItemsQuery()">🔍 Test Items Query</button>
+            <div id="endpointResults" style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; min-height: 20px;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Test de Funcionalidad</h3>
+            <div style="margin-bottom: 15px;">
+                <label>Código Producto: <input type="text" id="productCode" value="TEST001" /></label>
+                <label>Cantidad: <input type="number" id="quantity" value="5" min="0" /></label>
+                <label>Descuento %: <input type="number" id="discount" value="10" min="0" max="100" /></label>
+            </div>
+            <button class="btn-success" onclick="testAddItem()">➕ Agregar Item</button>
+            <button class="btn-success" onclick="testBatchUpdate()">📦 Test Batch Update</button>
+            <button class="btn-warning" onclick="testLimpiarCarrito()">🗑️ Limpiar Carrito</button>
+            <div id="functionalityResults" style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; min-height: 20px;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Test del Popup</h3>
+            <button class="btn-primary" onclick="openCarritoPopup()">🛒 Abrir Popup del Carrito</button>
+            <button class="btn-warning" onclick="closeCarritoPopup()">🚪 Cerrar Popup del Carrito</button>
+            <div id="popupResults" style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; min-height: 20px;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Logs del Sistema</h3>
+            <div id="logs" style="background: #2c3e50; color: #ecf0f1; padding: 15px; height: 250px; overflow-y: scroll; font-family: 'Courier New', monospace; font-size: 12px; border-radius: 5px;"></div>
+            <button class="btn-warning" onclick="clearLogs()">🧹 Limpiar Logs</button>
+            <button class="btn-primary" onclick="exportLogs()">📥 Exportar Logs</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>6. Información del Sistema</h3>
+            <div id="systemInfo" style="background: white; padding: 15px; border-radius: 5px;">
+                <p><strong>Versión:</strong> Carrito Popup V1.0</p>
+                <p><strong>Estado:</strong> <span id="systemStatus">Inicializando...</span></p>
+                <p><strong>Token:</strong> <span id="currentToken">No disponible</span></p>
+                <p><strong>Pedido ID:</strong> <span id="currentPedidoId">No disponible</span></p>
+                <p><strong>Versión:</strong> <span id="currentVersion">No disponible</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let pedidoToken = null;
+        let pedidoId = null;
+        let version = 0;
+        let carritoPopupInstance = null;
+        
+        // Función para logging
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const typeColor = type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : type === 'success' ? '#27ae60' : '#3498db';
+            const logEntry = `<span style="color: ${typeColor}">[${timestamp}] ${type.toUpperCase()}:</span> ${message}\n`;
+            logsDiv.innerHTML += logEntry;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        // 1. Verificar estado del sistema
+        async function checkStatus() {
+            const statusDiv = document.getElementById('status');
+            const statusIndicator = statusDiv.querySelector('.status-indicator');
+            
+            statusDiv.innerHTML = '<span class="status-indicator status-loading"></span> Verificando...';
+            
+            try {
+                // Verificar si el popup está cargado
+                if (typeof window.carritoPopup !== 'undefined') {
+                    carritoPopupInstance = window.carritoPopup;
+                    statusDiv.innerHTML = '<span class="status-indicator status-online"></span> ✅ Carrito Popup cargado correctamente';
+                    log('Carrito Popup detectado en window.carritoPopup', 'success');
+                    
+                    // Actualizar información del sistema
+                    updateSystemInfo();
+                    
+                } else {
+                    statusDiv.innerHTML = '<span class="status-indicator status-offline"></span> ❌ Carrito Popup NO detectado';
+                    log('ERROR: No se detectó carritoPopup en window', 'error');
+                }
+                
+                // Verificar si hay token guardado
+                const savedToken = localStorage.getItem('pedido_token');
+                if (savedToken) {
+                    pedidoToken = savedToken;
+                    log(`Token recuperado de localStorage: ${savedToken.substring(0, 15)}...`, 'info');
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="status-indicator status-offline"></span> ❌ Error verificando estado';
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // 2. Test de endpoints
+        async function testEnsure() {
+            const resultsDiv = document.getElementById('endpointResults');
+            resultsDiv.innerHTML = '🔄 Probando ensure...';
+            
+            try {
+                const response = await fetch('/api/pedido/ensure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken || ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        pedidoToken = data.pedido_token;
+                        pedidoId = data.pedido_id;
+                        version = data.version;
+                        
+                        // Guardar token
+                        localStorage.setItem('pedido_token', pedidoToken);
+                        
+                        resultsDiv.innerHTML = `
+                            <div style="color: #27ae60;">
+                                ✅ Ensure exitoso<br>
+                                Pedido ID: ${pedidoId}<br>
+                                Versión: ${version}<br>
+                                Token: ${pedidoToken.substring(0, 20)}...
+                            </div>
+                        `;
+                        log(`Ensure exitoso - Pedido ID: ${pedidoId}, Versión: ${version}`, 'success');
+                        
+                        // Actualizar información del sistema
+                        updateSystemInfo();
+                        
+                    } else {
+                        resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ Ensure falló: ${data.error}</span>`;
+                        log(`Ensure falló: ${data.error}`, 'error');
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ HTTP ${response.status}: ${response.statusText}</span>`;
+                    log(`HTTP Error: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ Error de conexión: ${error.message}</span>`;
+                log(`Error de conexión: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testResumen() {
+            if (!pedidoToken) {
+                document.getElementById('endpointResults').innerHTML = '<span style="color: #f39c12;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('endpointResults');
+            resultsDiv.innerHTML = '🔄 Probando resumen...';
+            
+            try {
+                const response = await fetch('/api/pedido/resumen', {
+                    headers: {
+                        'X-Pedido-Token': pedidoToken
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        resultsDiv.innerHTML = `
+                            <div style="color: #27ae60;">
+                                ✅ Resumen exitoso<br>
+                                Unidades: ${data.resumen.cantidad_productos || 0}<br>
+                                Total: $${(data.resumen.total_pedido || 0).toFixed(2)}<br>
+                                Versión: ${data.version}
+                            </div>
+                        `;
+                        log(`Resumen exitoso - Unidades: ${data.resumen.cantidad_productos}, Total: $${data.resumen.total_pedido}`, 'success');
+                    } else {
+                        resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ Resumen falló: ${data.error}</span>`;
+                        log(`Resumen falló: ${data.error}`, 'error');
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ HTTP ${response.status}</span>`;
+                    log(`HTTP Error: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testItemsQuery() {
+            if (!pedidoToken) {
+                document.getElementById('endpointResults').innerHTML = '<span style="color: #f39c12;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('endpointResults');
+            resultsDiv.innerHTML = '🔄 Probando items/query...';
+            
+            try {
+                const response = await fetch('/api/pedido/items/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken
+                    },
+                    body: JSON.stringify({
+                        pedido_id: pedidoId,
+                        codigos: ['TEST001', 'TEST002']
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        resultsDiv.innerHTML = `
+                            <div style="color: #27ae60;">
+                                ✅ Items/query exitoso<br>
+                                Items encontrados: ${data.items ? data.items.length : 0}
+                            </div>
+                        `;
+                        log(`Items/query exitoso - ${data.items ? data.items.length : 0} items`, 'success');
+                    } else {
+                        resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ Items/query falló: ${data.error}</span>`;
+                        log(`Items/query falló: ${data.error}`, 'error');
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ HTTP ${response.status}</span>`;
+                    log(`HTTP Error: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // 3. Test de funcionalidad
+        async function testAddItem() {
+            if (!pedidoToken) {
+                document.getElementById('functionalityResults').innerHTML = '<span style="color: #f39c12;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            const codigo = document.getElementById('productCode').value;
+            const cantidad = parseInt(document.getElementById('quantity').value);
+            const descuento = parseFloat(document.getElementById('discount').value);
+            
+            document.getElementById('functionalityResults').innerHTML = '🔄 Agregando item...';
+            
+            try {
+                const response = await fetch('/api/pedido/items/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken
+                    },
+                    body: JSON.stringify({
+                        pedido_id: pedidoId,
+                        version: version,
+                        items: [{
+                            producto_codigo: codigo,
+                            cantidad: cantidad,
+                            descuento: descuento
+                        }]
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        version = data.version;
+                        document.getElementById('functionalityResults').innerHTML = `
+                            <div style="color: #27ae60;">
+                                ✅ Item agregado exitosamente<br>
+                                Nueva versión: ${version}<br>
+                                Resumen actualizado
+                            </div>
+                        `;
+                        log(`Item agregado - Código: ${codigo}, Cantidad: ${cantidad}, Descuento: ${descuento}%`, 'success');
+                        
+                        // Actualizar información del sistema
+                        updateSystemInfo();
+                        
+                    } else {
+                        document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${data.error}</span>`;
+                        log(`Error agregando item: ${data.error}`, 'error');
+                    }
+                } else {
+                    document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ HTTP ${response.status}</span>`;
+                    log(`HTTP Error: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testBatchUpdate() {
+            if (!pedidoToken) {
+                document.getElementById('functionalityResults').innerHTML = '<span style="color: #f39c12;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            document.getElementById('functionalityResults').innerHTML = '🔄 Probando batch update...';
+            
+            try {
+                const response = await fetch('/api/pedido/items/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken
+                    },
+                    body: JSON.stringify({
+                        pedido_id: pedidoId,
+                        version: version,
+                        items: [
+                            {
+                                producto_codigo: 'TEST001',
+                                cantidad: 10,
+                                descuento: 15
+                            },
+                            {
+                                producto_codigo: 'TEST002',
+                                cantidad: 5,
+                                descuento: 20
+                            }
+                        ]
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        version = data.version;
+                        document.getElementById('functionalityResults').innerHTML = `
+                            <div style="color: #27ae60;">
+                                ✅ Batch update exitoso<br>
+                                Nueva versión: ${version}<br>
+                                Items procesados: ${data.items ? data.items.length : 0}
+                            </div>
+                        `;
+                        log(`Batch update exitoso - Versión: ${version}`, 'success');
+                        
+                        // Actualizar información del sistema
+                        updateSystemInfo();
+                        
+                    } else {
+                        document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${data.error}</span>`;
+                        log(`Error en batch update: ${data.error}`, 'error');
+                    }
+                } else {
+                    document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ HTTP ${response.status}</span>`;
+                    log(`HTTP Error: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLimpiarCarrito() {
+            if (!pedidoToken) {
+                document.getElementById('functionalityResults').innerHTML = '<span style="color: #f39c12;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que quieres limpiar el carrito?')) {
+                return;
+            }
+            
+            document.getElementById('functionalityResults').innerHTML = '🔄 Limpiando carrito...';
+            
+            try {
+                const response = await fetch('/api/pedido/items/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken
+                    },
+                    body: JSON.stringify({
+                        pedido_id: pedidoId,
+                        version: version,
+                        items: []
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        version = data.version;
+                        document.getElementById('functionalityResults').innerHTML = `
+                            <div style="color: #27ae60;">
+                                ✅ Carrito limpiado exitosamente<br>
+                                Nueva versión: ${version}
+                            </div>
+                        `;
+                        log('Carrito limpiado exitosamente', 'success');
+                        
+                        // Actualizar información del sistema
+                        updateSystemInfo();
+                        
+                    } else {
+                        document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${data.error}</span>`;
+                        log(`Error limpiando carrito: ${data.error}`, 'error');
+                    }
+                } else {
+                    document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ HTTP ${response.status}</span>`;
+                    log(`HTTP Error: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // 4. Test del popup
+        function openCarritoPopup() {
+            if (carritoPopupInstance) {
+                carritoPopupInstance.openPopup();
+                document.getElementById('popupResults').innerHTML = '<span style="color: #27ae60;">✅ Popup del carrito abierto</span>';
+                log('Popup del carrito abierto manualmente', 'info');
+            } else {
+                document.getElementById('popupResults').innerHTML = '<span style="color: #e74c3c;">❌ Carrito Popup no está disponible</span>';
+                log('Error: Carrito Popup no está disponible', 'error');
+            }
+        }
+        
+        function closeCarritoPopup() {
+            if (carritoPopupInstance) {
+                carritoPopupInstance.closePopup();
+                document.getElementById('popupResults').innerHTML = '<span style="color: #27ae60;">✅ Popup del carrito cerrado</span>';
+                log('Popup del carrito cerrado manualmente', 'info');
+            } else {
+                document.getElementById('popupResults').innerHTML = '<span style="color: #e74c3c;">❌ Carrito Popup no está disponible</span>';
+                log('Error: Carrito Popup no está disponible', 'error');
+            }
+        }
+        
+        // 5. Utilidades
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+            log('Logs limpiados', 'info');
+        }
+        
+        function exportLogs() {
+            const logs = document.getElementById('logs').innerText;
+            const blob = new Blob([logs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `carrito-popup-logs-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            log('Logs exportados', 'success');
+        }
+        
+        function resetCarrito() {
+            if (confirm('¿Estás seguro de que quieres resetear el carrito? Esto limpiará todos los datos.')) {
+                // Limpiar localStorage
+                localStorage.removeItem('pedido_token');
+                
+                // Resetear variables
+                pedidoToken = null;
+                pedidoId = null;
+                version = 0;
+                
+                // Limpiar resultados
+                document.getElementById('endpointResults').innerHTML = '';
+                document.getElementById('functionalityResults').innerHTML = '';
+                document.getElementById('popupResults').innerHTML = '';
+                
+                // Actualizar información del sistema
+                updateSystemInfo();
+                
+                log('Carrito reseteado completamente', 'warning');
+                
+                // Verificar estado
+                checkStatus();
+            }
+        }
+        
+        function updateSystemInfo() {
+            document.getElementById('currentToken').textContent = pedidoToken ? `${pedidoToken.substring(0, 20)}...` : 'No disponible';
+            document.getElementById('currentPedidoId').textContent = pedidoId || 'No disponible';
+            document.getElementById('currentVersion').textContent = version || 'No disponible';
+            
+            if (pedidoToken && pedidoId) {
+                document.getElementById('systemStatus').textContent = 'Conectado';
+                document.getElementById('systemStatus').style.color = '#27ae60';
+            } else {
+                document.getElementById('systemStatus').textContent = 'Desconectado';
+                document.getElementById('systemStatus').style.color = '#e74c3c';
+            }
+        }
+        
+        // Auto-check al cargar
+        window.addEventListener('load', () => {
+            log('Página de test del carrito popup cargada', 'info');
+            setTimeout(checkStatus, 1000);
+        });
+    </script>
+</body>
+</html>

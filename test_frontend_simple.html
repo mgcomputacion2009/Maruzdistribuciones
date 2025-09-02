@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Frontend Simple - Maruz</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background: #f9f9f9;
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            cursor: pointer; 
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+        }
+        button:hover { background: #0056b3; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test Frontend Simple - Maruz</h1>
+        
+        <div class="test-section">
+            <h3>1. Test de JavaScript Básico</h3>
+            <button onclick="testJavaScript()">Probar JavaScript</button>
+            <div id="jsStatus" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Test de Fetch API</h3>
+            <button onclick="testFetch()">Probar Fetch</button>
+            <div id="fetchStatus" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Test de Autocompletado</h3>
+            <button onclick="testAutocompletado()">Probar Autocompletado</button>
+            <div id="autocompleteStatus" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Test de Carrito Simple</h3>
+            <button onclick="testCarrito()">Probar Carrito</button>
+            <div id="carritoStatus" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Estado del Sistema</h3>
+            <div id="systemStatus" class="status info">
+                Estado: Inicializando...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Test de JavaScript básico
+        function testJavaScript() {
+            const status = document.getElementById('jsStatus');
+            try {
+                // Probar funcionalidades básicas
+                const testArray = [1, 2, 3];
+                const testObject = { test: 'value' };
+                const testString = 'Hello World';
+                
+                if (testArray.length === 3 && 
+                    testObject.test === 'value' && 
+                    testString.includes('Hello')) {
+                    status.innerHTML = '<div class="success">✅ JavaScript funcionando correctamente</div>';
+                } else {
+                    throw new Error('Funcionalidades básicas fallaron');
+                }
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error en JavaScript: ${error.message}</div>`;
+            }
+        }
+        
+        // 2. Test de Fetch API
+        function testFetch() {
+            const status = document.getElementById('fetchStatus');
+            status.innerHTML = '<div class="info">🔄 Probando Fetch API...</div>';
+            
+            // Probar fetch básico
+            fetch('/api/autocomplete?q=test')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                })
+                .then(data => {
+                    status.innerHTML = `<div class="success">✅ Fetch funcionando - Respuesta: ${JSON.stringify(data).substring(0, 100)}...</div>`;
+                })
+                .catch(error => {
+                    status.innerHTML = `<div class="error">❌ Error en Fetch: ${error.message}</div>`;
+                });
+        }
+        
+        // 3. Test de Autocompletado
+        function testAutocompletado() {
+            const status = document.getElementById('autocompleteStatus');
+            status.innerHTML = '<div class="info">🔄 Probando autocompletado...</div>';
+            
+            // Simular búsqueda
+            const testQuery = 'aceite';
+            const url = `/api/autocomplete?q=${encodeURIComponent(testQuery)}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        status.innerHTML = `<div class="success">✅ Autocompletado funcionando - ${data.length} productos encontrados para "${testQuery}"</div>`;
+                        
+                        if (data.length > 0) {
+                            const primerProducto = data[0];
+                            status.innerHTML += `<br><small>Primer producto: ${primerProducto.codigo} - ${primerProducto.descripcion}</small>`;
+                        }
+                    } else {
+                        throw new Error('Respuesta no es un array');
+                    }
+                })
+                .catch(error => {
+                    status.innerHTML = `<div class="error">❌ Error en autocompletado: ${error.message}</div>`;
+                });
+        }
+        
+        // 4. Test de Carrito Simple
+        function testCarrito() {
+            const status = document.getElementById('carritoStatus');
+            status.innerHTML = '<div class="info">🔄 Probando carrito simple...</div>';
+            
+            try {
+                // Probar localStorage
+                const testData = { test: 'producto', cantidad: 1, descuento: 0 };
+                localStorage.setItem('maruz_carrito_test', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('maruz_carrito_test'));
+                
+                if (retrieved.test === testData.test) {
+                    status.innerHTML = '<div class="success">✅ Carrito simple funcionando - localStorage OK</div>';
+                } else {
+                    throw new Error('localStorage no funciona correctamente');
+                }
+                
+                // Limpiar test
+                localStorage.removeItem('maruz_carrito_test');
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error en carrito: ${error.message}</div>`;
+            }
+        }
+        
+        // 5. Estado del sistema
+        function updateSystemStatus() {
+            const status = document.getElementById('systemStatus');
+            
+            // Verificar funcionalidades básicas
+            const checks = [
+                { name: 'JavaScript', test: () => typeof Array !== 'undefined' },
+                { name: 'Fetch API', test: () => typeof fetch !== 'undefined' },
+                { name: 'localStorage', test: () => typeof localStorage !== 'undefined' },
+                { name: 'DOM', test: () => typeof document !== 'undefined' }
+            ];
+            
+            const results = checks.map(check => ({
+                name: check.name,
+                working: check.test()
+            }));
+            
+            const workingCount = results.filter(r => r.working).length;
+            const totalCount = results.length;
+            
+            if (workingCount === totalCount) {
+                status.innerHTML = `<div class="success">✅ Sistema funcionando perfectamente (${workingCount}/${totalCount})</div>`;
+            } else {
+                status.innerHTML = `<div class="error">⚠️ Sistema parcialmente funcional (${workingCount}/${totalCount})</div>`;
+            }
+            
+            // Mostrar detalles
+            results.forEach(result => {
+                const icon = result.working ? '✅' : '❌';
+                status.innerHTML += `<br><small>${icon} ${result.name}</small>`;
+            });
+        }
+        
+        // Inicializar cuando la página cargue
+        window.addEventListener('load', () => {
+            console.log('Página de test cargada');
+            updateSystemStatus();
+        });
+    </script>
+</body>
+</html>

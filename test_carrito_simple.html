@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Carrito Avanzado</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        input { padding: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test del Carrito Avanzado V2</h1>
+    
+    <div class="test-section">
+        <h3>1. Estado del Sistema</h3>
+        <div id="status">Verificando...</div>
+        <button onclick="checkStatus()">Verificar Estado</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Test de Endpoints</h3>
+        <button onclick="testEnsure()">Test Ensure</button>
+        <button onclick="testResumen()">Test Resumen</button>
+        <button onclick="testItemsQuery()">Test Items Query</button>
+        <div id="endpointResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Test de Funcionalidad</h3>
+        <div>
+            <label>Código Producto: <input type="text" id="productCode" value="TEST001" /></label>
+            <label>Cantidad: <input type="number" id="quantity" value="5" min="0" /></label>
+            <label>Descuento %: <input type="number" id="discount" value="10" min="0" max="100" /></label>
+        </div>
+        <button onclick="testAddItem()">Agregar Item</button>
+        <button onclick="testBatchUpdate()">Test Batch Update</button>
+        <div id="functionalityResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Logs del Sistema</h3>
+        <div id="logs" style="background: #f8f9fa; padding: 10px; height: 200px; overflow-y: scroll; font-family: monospace; font-size: 12px;"></div>
+        <button onclick="clearLogs()">Limpiar Logs</button>
+    </div>
+
+    <script>
+        // Variables globales
+        let pedidoToken = null;
+        let pedidoId = null;
+        let version = 0;
+        
+        // Función para logging
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            logsDiv.textContent += logEntry;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        // 1. Verificar estado del sistema
+        async function checkStatus() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = 'Verificando...';
+            
+            try {
+                // Verificar si la página está cargada
+                if (typeof window.carritoAvanzado !== 'undefined') {
+                    statusDiv.innerHTML = '<span style="color: green;">✅ Carrito Avanzado V2 cargado correctamente</span>';
+                    log('Carrito Avanzado V2 detectado en window.carritoAvanzado');
+                } else {
+                    statusDiv.innerHTML = '<span style="color: red;">❌ Carrito Avanzado V2 NO detectado</span>';
+                    log('ERROR: No se detectó carritoAvanzado en window', 'error');
+                }
+                
+                // Verificar si hay token guardado
+                const savedToken = localStorage.getItem('pedido_token');
+                if (savedToken) {
+                    pedidoToken = savedToken;
+                    log(`Token recuperado de localStorage: ${savedToken.substring(0, 10)}...`);
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = '<span style="color: red;">❌ Error verificando estado</span>';
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // 2. Test de endpoints
+        async function testEnsure() {
+            const resultsDiv = document.getElementById('endpointResults');
+            resultsDiv.innerHTML = 'Probando ensure...';
+            
+            try {
+                const response = await fetch('/api/pedido/ensure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken || ''
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        pedidoToken = data.pedido_token;
+                        pedidoId = data.pedido_id;
+                        version = data.version;
+                        
+                        // Guardar token
+                        localStorage.setItem('pedido_token', pedidoToken);
+                        
+                        resultsDiv.innerHTML = `
+                            <div style="color: green;">
+                                ✅ Ensure exitoso<br>
+                                Pedido ID: ${pedidoId}<br>
+                                Versión: ${version}<br>
+                                Token: ${pedidoToken.substring(0, 15)}...
+                            </div>
+                        `;
+                        log(`Ensure exitoso - Pedido ID: ${pedidoId}, Versión: ${version}`);
+                    } else {
+                        resultsDiv.innerHTML = `<span style="color: red;">❌ Ensure falló: ${data.error}</span>`;
+                        log(`Ensure falló: ${data.error}`, 'error');
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span style="color: red;">❌ HTTP ${response.status}: ${response.statusText}</span>`;
+                    log(`HTTP Error: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<span style="color: red;">❌ Error de conexión: ${error.message}</span>`;
+                log(`Error de conexión: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testResumen() {
+            if (!pedidoToken) {
+                document.getElementById('endpointResults').innerHTML = '<span style="color: orange;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('endpointResults');
+            resultsDiv.innerHTML = 'Probando resumen...';
+            
+            try {
+                const response = await fetch('/api/pedido/resumen', {
+                    headers: {
+                        'X-Pedido-Token': pedidoToken
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        resultsDiv.innerHTML = `
+                            <div style="color: green;">
+                                ✅ Resumen exitoso<br>
+                                Unidades: ${data.resumen.cantidad_productos || 0}<br>
+                                Total: $${(data.resumen.total_pedido || 0).toFixed(2)}<br>
+                                Versión: ${data.version}
+                            </div>
+                        `;
+                        log(`Resumen exitoso - Unidades: ${data.resumen.cantidad_productos}, Total: $${data.resumen.total_pedido}`);
+                    } else {
+                        resultsDiv.innerHTML = `<span style="color: red;">❌ Resumen falló: ${data.error}</span>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span style="color: red;">❌ HTTP ${response.status}</span>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testItemsQuery() {
+            if (!pedidoToken) {
+                document.getElementById('endpointResults').innerHTML = '<span style="color: orange;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('endpointResults');
+            resultsDiv.innerHTML = 'Probando items/query...';
+            
+            try {
+                const response = await fetch('/api/pedido/items/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken
+                    },
+                    body: JSON.stringify({
+                        pedido_id: pedidoId,
+                        codigos: ['TEST001', 'TEST002']
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        resultsDiv.innerHTML = `
+                            <div style="color: green;">
+                                ✅ Items/query exitoso<br>
+                                Items encontrados: ${data.items ? data.items.length : 0}
+                            </div>
+                        `;
+                        log(`Items/query exitoso - ${data.items ? data.items.length : 0} items`);
+                    } else {
+                        resultsDiv.innerHTML = `<span style="color: red;">❌ Items/query falló: ${data.error}</span>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<span style="color: red;">❌ HTTP ${response.status}</span>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        // 3. Test de funcionalidad
+        async function testAddItem() {
+            if (!pedidoToken) {
+                document.getElementById('functionalityResults').innerHTML = '<span style="color: orange;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            const codigo = document.getElementById('productCode').value;
+            const cantidad = parseInt(document.getElementById('quantity').value);
+            const descuento = parseFloat(document.getElementById('discount').value);
+            
+            document.getElementById('functionalityResults').innerHTML = 'Agregando item...';
+            
+            try {
+                const response = await fetch('/api/pedido/items/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken
+                    },
+                    body: JSON.stringify({
+                        pedido_id: pedidoId,
+                        version: version,
+                        items: [{
+                            producto_codigo: codigo,
+                            cantidad: cantidad,
+                            descuento: descuento
+                        }]
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        version = data.version;
+                        document.getElementById('functionalityResults').innerHTML = `
+                            <div style="color: green;">
+                                ✅ Item agregado exitosamente<br>
+                                Nueva versión: ${version}<br>
+                                Resumen actualizado
+                            </div>
+                        `;
+                        log(`Item agregado - Código: ${codigo}, Cantidad: ${cantidad}, Descuento: ${descuento}%`);
+                    } else {
+                        document.getElementById('functionalityResults').innerHTML = `<span style="color: red;">❌ Error: ${data.error}</span>`;
+                    }
+                } else {
+                    document.getElementById('functionalityResults').innerHTML = `<span style="color: red;">❌ HTTP ${response.status}</span>`;
+                }
+                
+            } catch (error) {
+                document.getElementById('functionalityResults').innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testBatchUpdate() {
+            if (!pedidoToken) {
+                document.getElementById('functionalityResults').innerHTML = '<span style="color: orange;">⚠️ Primero ejecuta Ensure</span>';
+                return;
+            }
+            
+            document.getElementById('functionalityResults').innerHTML = 'Probando batch update...';
+            
+            try {
+                const response = await fetch('/api/pedido/items/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Pedido-Token': pedidoToken
+                    },
+                    body: JSON.stringify({
+                        pedido_id: pedidoId,
+                        version: version,
+                        items: [
+                            {
+                                producto_codigo: 'TEST001',
+                                cantidad: 10,
+                                descuento: 15
+                            },
+                            {
+                                producto_codigo: 'TEST002',
+                                cantidad: 5,
+                                descuento: 20
+                            }
+                        ]
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        version = data.version;
+                        document.getElementById('functionalityResults').innerHTML = `
+                            <div style="color: green;">
+                                ✅ Batch update exitoso<br>
+                                Nueva versión: ${version}<br>
+                                Items procesados: ${data.items ? data.items.length : 0}
+                            </div>
+                        `;
+                        log(`Batch update exitoso - Versión: ${version}`);
+                    } else {
+                        document.getElementById('functionalityResults').innerHTML = `<span style="color: red;">❌ Error: ${data.error}</span>`;
+                    }
+                } else {
+                    document.getElementById('functionalityResults').innerHTML = `<span style="color: red;">❌ HTTP ${response.status}</span>`;
+                }
+                
+            } catch (error) {
+                document.getElementById('functionalityResults').innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        function clearLogs() {
+            document.getElementById('logs').textContent = '';
+        }
+        
+        // Auto-check al cargar
+        window.addEventListener('load', () => {
+            log('Página de test cargada');
+            setTimeout(checkStatus, 1000);
+        });
+    </script>
+</body>
+</html>

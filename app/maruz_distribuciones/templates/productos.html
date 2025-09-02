@@ -541,15 +541,15 @@
             <div class="summary-info">
                 <div class="summary-item">
                     <div class="summary-label">Unidades</div>
-                    <div class="summary-value" id="totalProducts">0</div>
+                    <div class="summary-value" id="totalProducts" data-summary="unidades">0</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-label">Subtotal</div>
-                    <div class="summary-value" id="subtotal">$0.00</div>
+                    <div class="summary-value" id="subtotal" data-summary="subtotal">$0.00</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-label">Total con descuento</div>
-                    <div class="summary-value summary-total" id="totalWithDiscount">$0.00</div>
+                    <div class="summary-value summary-total" id="totalWithDiscount" data-summary="total">$0.00</div>
                 </div>
             </div>
             <div class="summary-actions">
@@ -615,7 +615,7 @@
 
         <div class="list" id="list">
             {% for p in productos %}
-            <div class="row" onclick="toggleRow(this)" data-codigo="{{ p.codigo }}">
+            <div class="row" onclick="toggleRow(this)" data-codigo="{{ p.codigo }}" data-producto="{{ p.codigo }}">
                 <div class="thumb"><img src="{{ p.img_url }}&v={{ v }}" alt="{{ p.codigo }}" loading="lazy" /></div>
                 <div class="main">
                     <div class="desc">{{ p.descripcion }}</div>
@@ -667,6 +667,7 @@
     </div>
 
     <!-- Sistema de Carrito Simple y Robusto -->
+    <!-- 🛒 CARRITO SIMPLE - Sistema original que funcionaba -->
     <script src="{{ url_for('static', filename='js/carrito-simple.js') }}"></script>
 
     <script>
@@ -1256,6 +1257,27 @@
                     hideSuggestions();
                 });
         }
+
+        // Registro rápido de ranking al enviar la búsqueda (asegura guardar top-5 incluso si no se usa el autocomplete)
+        async function registrarBusquedaRankingRapido(query){
+            if (!query || query.length < 2) return;
+            let cliente_id = null;
+            try {
+                if (typeof window.userId !== 'undefined' && window.userId) {
+                    cliente_id = window.userId;
+                }
+            } catch (e) {}
+            const url = cliente_id 
+                ? `/api/autocomplete?q=${encodeURIComponent(query)}&cliente_id=${cliente_id}`
+                : `/api/autocomplete?q=${encodeURIComponent(query)}`;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 800); // no bloquear la UX
+            try {
+                await fetch(url, { signal: controller.signal }).catch(()=>{});
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
         
         function showSuggestions(suggestions) {
             const container = document.getElementById('autocompleteSuggestions');
@@ -1305,6 +1327,26 @@
             }
             selectedIndex = -1;
         }
+
+        // Interceptar el submit para registrar ranking antes de navegar
+        document.addEventListener('DOMContentLoaded', function(){
+            const form = document.getElementById('searchForm');
+            const input = document.getElementById('searchInput');
+            if (form && input) {
+                form.addEventListener('submit', async function(ev){
+                    const query = (input.value || '').trim();
+                    if (query.length >= 2) {
+                        ev.preventDefault();
+                        // Correr registro rápido con timeout máximo de 600ms; luego enviar
+                        const cap = new Promise(r => setTimeout(r, 600));
+                        try {
+                            await Promise.race([registrarBusquedaRankingRapido(query), cap]);
+                        } catch (_) {}
+                        finally { form.submit(); }
+                    }
+                }, { capture: true });
+            }
+        });
         
         function selectNextSuggestion() {
             if (currentSuggestions.length === 0) return;
@@ -1768,19 +1810,19 @@
             }
         }
 
-        // Cargar carrito existente cuando la página está lista
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📄 DOM cargado, iniciando carga de carrito...');
-            cargarCarritoExistente();
-            // Guardar antes de navegar por paginación
-            const pagerLinks = document.querySelectorAll('.pager a');
-            pagerLinks.forEach(a => {
-                a.addEventListener('click', (e) => {
-                    // Guardado sincrónico antes de navegar
-                    saveCartToServer(true);
-                });
-            });
-        });
+        // COMENTADO - Ahora usa el carrito avanzado
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     console.log('📄 DOM cargado, iniciando carga de carrito...');
+        //     cargarCarritoExistente();
+        //     // Guardar antes de navegar por paginación
+        //     const pagerLinks = document.querySelectorAll('.pager a');
+        //     pagerLinks.forEach(a => {
+        //         a.addEventListener('click', (e) => {
+        //             // Guardado sincrónico antes de navegar
+        //             saveCartToServer(true);
+        //         });
+        //     });
+        // });
 
         // Event listener para cerrar modal al hacer clic fuera
         window.addEventListener('click', function(event) {

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Carrito Popup Simple</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Inter', Arial, sans-serif; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .test-section { 
+            margin: 25px 0; 
+            padding: 20px; 
+            border: 1px solid #e1e5e9; 
+            border-radius: 10px; 
+            background: #f8f9fa;
+        }
+        .test-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        button { 
+            padding: 12px 20px; 
+            margin: 8px; 
+            cursor: pointer; 
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background-color: #27ae60; }
+        .status-offline { background-color: #e74c3c; }
+        .status-loading { background-color: #f39c12; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test del Carrito Popup Simple</h1>
+        <p style="color: #666; margin-bottom: 30px;">
+            Versión simplificada y funcional del carrito popup
+        </p>
+        
+        <div class="test-section">
+            <h3>1. Estado del Sistema</h3>
+            <div id="status">
+                <span class="status-indicator status-loading"></span>
+                Verificando estado del carrito popup simple...
+            </div>
+            <button class="btn-primary" onclick="checkStatus()">🔄 Verificar Estado</button>
+            <button class="btn-warning" onclick="resetCarrito()">🔄 Resetear Carrito</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Test del Popup</h3>
+            <button class="btn-primary" onclick="openCarritoPopup()">🛒 Abrir Popup del Carrito</button>
+            <button class="btn-warning" onclick="closeCarritoPopup()">🚪 Cerrar Popup del Carrito</button>
+            <div id="popupResults" style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; min-height: 20px;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Test de Funcionalidad</h3>
+            <button class="btn-success" onclick="testAddItem()">➕ Agregar Item de Prueba</button>
+            <button class="btn-warning" onclick="testLimpiarCarrito()">🗑️ Limpiar Carrito</button>
+            <div id="functionalityResults" style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; min-height: 20px;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. Información del Sistema</h3>
+            <div id="systemInfo" style="background: white; padding: 15px; border-radius: 5px;">
+                <p><strong>Versión:</strong> Carrito Popup Simple V1.0</p>
+                <p><strong>Estado:</strong> <span id="systemStatus">Inicializando...</span></p>
+                <p><strong>Token:</strong> <span id="currentToken">No disponible</span></p>
+                <p><strong>Pedido ID:</strong> <span id="currentPedidoId">No disponible</span></p>
+                <p><strong>Versión:</strong> <span id="currentVersion">No disponible</span></p>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>5. Instrucciones de Uso</h3>
+            <div style="background: white; padding: 15px; border-radius: 5px;">
+                <ol>
+                    <li><strong>Verificar Estado:</strong> Comprueba que el carrito esté funcionando</li>
+                    <li><strong>Abrir Popup:</strong> Abre el popup del carrito para ver su contenido</li>
+                    <li><strong>Agregar Item:</strong> Agrega un producto de prueba al carrito</li>
+                    <li><strong>Limpiar Carrito:</strong> Limpia todos los productos del carrito</li>
+                    <li><strong>Ver Botón Flotante:</strong> El botón azul del carrito debe aparecer en la esquina derecha</li>
+                </ol>
+                <p style="margin-top: 15px; color: #666;">
+                    <strong>Nota:</strong> Este es un sistema simplificado que no se queda colgado. 
+                    Si hay problemas, usa "Resetear Carrito" para limpiar el estado.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let carritoPopupInstance = null;
+        
+        // 1. Verificar estado del sistema
+        async function checkStatus() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<span class="status-indicator status-loading"></span> Verificando...';
+            
+            try {
+                // Verificar si el popup simple está cargado
+                if (typeof window.carritoPopupSimple !== 'undefined') {
+                    carritoPopupInstance = window.carritoPopupSimple;
+                    statusDiv.innerHTML = '<span class="status-indicator status-online"></span> ✅ Carrito Popup Simple cargado correctamente';
+                    
+                    // Actualizar información del sistema
+                    updateSystemInfo();
+                    
+                } else {
+                    statusDiv.innerHTML = '<span class="status-indicator status-offline"></span> ❌ Carrito Popup Simple NO detectado';
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="status-indicator status-offline"></span> ❌ Error verificando estado';
+                console.error('Error:', error);
+            }
+        }
+        
+        // 2. Test del popup
+        function openCarritoPopup() {
+            if (carritoPopupInstance) {
+                carritoPopupInstance.openPopup();
+                document.getElementById('popupResults').innerHTML = '<span style="color: #27ae60;">✅ Popup del carrito abierto</span>';
+            } else {
+                document.getElementById('popupResults').innerHTML = '<span style="color: #e74c3c;">❌ Carrito Popup Simple no está disponible</span>';
+            }
+        }
+        
+        function closeCarritoPopup() {
+            if (carritoPopupInstance) {
+                carritoPopupInstance.closePopup();
+                document.getElementById('popupResults').innerHTML = '<span style="color: #27ae60;">✅ Popup del carrito cerrado</span>';
+            } else {
+                document.getElementById('popupResults').innerHTML = '<span style="color: #e74c3c;">❌ Carrito Popup Simple no está disponible</span>';
+            }
+        }
+        
+        // 3. Test de funcionalidad
+        async function testAddItem() {
+            if (!carritoPopupInstance) {
+                document.getElementById('functionalityResults').innerHTML = '<span style="color: #f39c12;">⚠️ Primero verifica el estado del sistema</span>';
+                return;
+            }
+            
+            document.getElementById('functionalityResults').innerHTML = '🔄 Agregando item de prueba...';
+            
+            try {
+                // Simular agregar un item
+                const testItem = {
+                    producto_codigo: 'TEST' + Date.now(),
+                    cantidad: 1,
+                    descuento: 0
+                };
+                
+                // Agregar a la lista local
+                if (carritoPopupInstance.items) {
+                    carritoPopupInstance.items.push(testItem);
+                    carritoPopupInstance.renderItems();
+                }
+                
+                document.getElementById('functionalityResults').innerHTML = `
+                    <div style="color: #27ae60;">
+                        ✅ Item de prueba agregado<br>
+                        Código: ${testItem.producto_codigo}<br>
+                        Cantidad: ${testItem.cantidad}
+                    </div>
+                `;
+                
+            } catch (error) {
+                document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testLimpiarCarrito() {
+            if (!carritoPopupInstance) {
+                document.getElementById('functionalityResults').innerHTML = '<span style="color: #f39c12;">⚠️ Primero verifica el estado del sistema</span>';
+                return;
+            }
+            
+            if (confirm('¿Estás seguro de que quieres limpiar el carrito?')) {
+                document.getElementById('functionalityResults').innerHTML = '🔄 Limpiando carrito...';
+                
+                try {
+                    // Limpiar lista local
+                    if (carritoPopupInstance.items) {
+                        carritoPopupInstance.items = [];
+                        carritoPopupInstance.renderItems();
+                    }
+                    
+                    document.getElementById('functionalityResults').innerHTML = `
+                        <div style="color: #27ae60;">
+                            ✅ Carrito limpiado exitosamente
+                        </div>
+                    `;
+                    
+                } catch (error) {
+                    document.getElementById('functionalityResults').innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+                }
+            }
+        }
+        
+        // 4. Utilidades
+        function resetCarrito() {
+            if (confirm('¿Estás seguro de que quieres resetear el carrito? Esto limpiará todos los datos.')) {
+                // Limpiar localStorage
+                localStorage.removeItem('pedido_token');
+                
+                // Limpiar resultados
+                document.getElementById('popupResults').innerHTML = '';
+                document.getElementById('functionalityResults').innerHTML = '';
+                
+                // Actualizar información del sistema
+                updateSystemInfo();
+                
+                // Verificar estado
+                checkStatus();
+            }
+        }
+        
+        function updateSystemInfo() {
+            if (carritoPopupInstance) {
+                document.getElementById('currentToken').textContent = carritoPopupInstance.pedidoToken ? `${carritoPopupInstance.pedidoToken.substring(0, 20)}...` : 'No disponible';
+                document.getElementById('currentPedidoId').textContent = carritoPopupInstance.pedidoId || 'No disponible';
+                document.getElementById('currentVersion').textContent = carritoPopupInstance.version || 'No disponible';
+                
+                if (carritoPopupInstance.pedidoToken && carritoPopupInstance.pedidoId) {
+                    document.getElementById('systemStatus').textContent = 'Conectado';
+                    document.getElementById('systemStatus').style.color = '#27ae60';
+                } else {
+                    document.getElementById('systemStatus').textContent = 'Desconectado';
+                    document.getElementById('systemStatus').style.color = '#e74c3c';
+                }
+            } else {
+                document.getElementById('currentToken').textContent = 'No disponible';
+                document.getElementById('currentPedidoId').textContent = 'No disponible';
+                document.getElementById('currentVersion').textContent = 'No disponible';
+                document.getElementById('systemStatus').textContent = 'No disponible';
+                document.getElementById('systemStatus').style.color = '#999';
+            }
+        }
+        
+        // Auto-check al cargar
+        window.addEventListener('load', () => {
+            console.log('Página de test del carrito popup simple cargada');
+            setTimeout(checkStatus, 1000);
+        });
+    </script>
+</body>
+</html>

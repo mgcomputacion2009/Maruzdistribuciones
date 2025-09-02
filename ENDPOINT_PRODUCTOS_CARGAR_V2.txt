@@ -1,0 +1,336 @@
+🎯 ENDPOINT DE CARGA DE PRODUCTOS V2 - MARUZ DISTRIBUCIONES
+================================================================
+
+📁 ARCHIVO: /var/www/maruz/app/maruz_distribuciones/api/cargar_productos_v2.py
+🔧 FUNCIÓN: cargar_productos_v2() (líneas 209-302)
+
+🌐 URL DEL ENDPOINT:
+POST http://localhost:8002/api/productos/cargar_v2
+
+📋 HEADERS REQUERIDOS:
+Content-Type: application/json
+
+✅ CAMPOS OBLIGATORIOS:
+- CODIGO: Código del producto (máx. 100 caracteres)
+- DESCRIPCION: Descripción del producto (máx. 65535 caracteres)
+
+💰 CAMPOS NUMÉRICOS VALIDADOS:
+- PRE_PRECIO: Precio anterior
+- PRECIOA: Precio A (precio regular)
+- PRECIOB: Precio B (precio especial)
+- PRECIOA + IVA: Precio A con IVA incluido
+- PRECIOB + IVA: Precio B con IVA incluido
+- ULTIMO_COSTO: Último costo de compra
+- COSTO USD: Costo en dólares
+- UTIL: Utilidad/margen
+- EXIS: Existencia/Stock actual
+
+📝 CAMPOS OPCIONALES:
+- ALTERNO: Código alterno
+- ALMACEN: Ubicación del almacén
+- UND MED: Unidad de medida
+- TIPO IVA: Tipo de impuesto
+- MARCA: Marca del producto
+- GRUPO: Grupo de productos
+- SUB GRUPO: Subgrupo específico
+- BARRAS: Código de barras
+- IMAGEN1, IMAGEN2, IMAGEN3: URLs de imágenes
+- IMAGEN1(EDITADA), IMAGEN2(EDITADA), IMAGEN3(EDITADA): URLs de imágenes editadas
+- WEB: URL web (máx. 500 caracteres)
+- CATEGORIA: Categoría del producto
+- Descripción Producto: Descripción detallada
+- Propiedades: Propiedades del producto
+- Datos técnicos: Datos técnicos
+- Especificaciones: Especificaciones
+- Campos de aplicación: Campos de aplicación
+- Envases disponibles: Envases disponibles
+- pdf: URL del PDF
+- RECOMENDACIONES: Recomendaciones
+- cont, PR, IDdrive, qrt: Campos adicionales
+
+📦 ESTRUCTURA DEL PAYLOAD REQUERIDA:
+{
+  "productos": [
+    // Array de productos
+  ],
+  "timestamp": "2025-09-01T07:30:00.000Z", // Opcional
+  "origen": "API v2" // Opcional
+}
+
+✅ EJEMPLO DE PAYLOAD CORRECTO CON 2 PRODUCTOS:
+
+{
+  "productos": [
+    {
+      "CODIGO": "AL3690",
+      "DESCRIPCION": "FILTRO ACEITE DETRIT MOTOR DIESEL NPR 98 4 BD 518",
+      "ALTERNO": "ALT001",
+      "PRE_PRECIO": 4.19,
+      "PRECIOA": 4.50,
+      "PRECIOB": 4.20,
+      "PRECIOA + IVA": 5.36,
+      "PRECIOB + IVA": 5.00,
+      "ULTIMO_COSTO": 3.80,
+      "COSTO USD": 3.50,
+      "UTIL": 0.70,
+      "EXIS": 150,
+      "ALMACEN": "Principal",
+      "UND MED": "UN",
+      "TIPO IVA": "19%",
+      "MARCA": "DETRIT",
+      "GRUPO": "FILTROS",
+      "SUB GRUPO": "ACEITE",
+      "BARRAS": "1234567890123",
+      "IMAGEN1": "https://maruz.com/images/AL3690_1.jpg",
+      "IMAGEN2": "https://maruz.com/images/AL3690_2.jpg",
+      "IMAGEN3": "https://maruz.com/images/AL3690_3.jpg",
+      "IMAGEN1(EDITADA)": "https://maruz.com/images/edited/AL3690_1.jpg",
+      "WEB": "https://maruz.com/productos/AL3690",
+      "CATEGORIA": "000013 - A1 FILTROS DE ACEITE",
+      "Descripción Producto": "Filtro de aceite para motor diesel NPR 98 4 BD 518",
+      "Propiedades": "Filtro de alta eficiencia",
+      "Datos técnicos": "Presión: 15 PSI, Flujo: 25 GPM",
+      "Especificaciones": "Material: Celulosa, Tamaño: 4.5 pulgadas",
+      "Campos de aplicación": "Motores diesel, vehículos comerciales",
+      "Envases disponibles": "Caja x 12 unidades",
+      "pdf": "https://maruz.com/pdfs/AL3690.pdf",
+      "RECOMENDACIONES": "Cambiar cada 10,000 km",
+      "cont": "CONT001",
+      "PR": "PR001",
+      "IDdrive": "DRIVE123",
+      "qrt": "QRT001"
+    },
+    {
+      "CODIGO": "AL10060",
+      "DESCRIPCION": "FILTRO ACEITE THOE AVALACHE SILVERADO",
+      "ALTERNO": "ALT002",
+      "PRE_PRECIO": 3.95,
+      "PRECIOA": 4.25,
+      "PRECIOB": 3.95,
+      "PRECIOA + IVA": 5.06,
+      "PRECIOB + IVA": 4.70,
+      "ULTIMO_COSTO": 3.60,
+      "COSTO USD": 3.30,
+      "UTIL": 0.65,
+      "EXIS": 200,
+      "ALMACEN": "Principal",
+      "UND MED": "UN",
+      "TIPO IVA": "19%",
+      "MARCA": "THOE",
+      "GRUPO": "FILTROS",
+      "SUB GRUPO": "ACEITE",
+      "BARRAS": "1234567890124",
+      "IMAGEN1": "https://maruz.com/images/AL10060_1.jpg",
+      "IMAGEN2": "https://maruz.com/images/AL10060_2.jpg",
+      "WEB": "https://maruz.com/productos/AL10060",
+      "CATEGORIA": "000013 - A1 FILTROS DE ACEITE",
+      "Descripción Producto": "Filtro de aceite para Avalanche Silverado",
+      "Propiedades": "Filtro de alta eficiencia para vehículos GM",
+      "Datos técnicos": "Presión: 12 PSI, Flujo: 20 GPM",
+      "Especificaciones": "Material: Celulosa, Tamaño: 4.0 pulgadas",
+      "Campos de aplicación": "Chevrolet Avalanche, Silverado",
+      "Envases disponibles": "Caja x 10 unidades",
+      "pdf": "https://maruz.com/pdfs/AL10060.pdf",
+      "RECOMENDACIONES": "Cambiar cada 8,000 km"
+    }
+  ],
+  "timestamp": "2025-09-01T07:30:00.000Z",
+  "origen": "maruz"
+}
+
+✅ RESPUESTA DE ÉXITO (200):
+{
+  "success": true,
+  "resumen": {
+    "total_productos": 2,
+    "insertados": 1,
+    "actualizados": 1,
+    "errores": 0,
+    "tiempo_procesamiento_segundos": 0.15
+  },
+  "detalles": {
+    "productos_con_errores": []
+  },
+  "timestamp": "2025-09-01T07:30:00.150Z",
+  "empresa": "Maruz Distribuciones",
+  "ambiente": "desarrollo",
+  "version": "v2"
+}
+
+❌ RESPUESTA DE ERROR (400):
+{
+  "success": false,
+  "error": "Datos JSON inválidos o faltantes",
+  "timestamp": "2025-09-01T07:30:00.000Z"
+}
+
+🔄 COMPORTAMIENTO:
+- Upsert: Si el producto existe (por CODIGO), se actualiza; si no existe, se inserta
+- Validación: Cada producto se valida individualmente
+- Procesamiento por lotes: Procesa todos los productos en una sola transacción
+- Logging: Registra cada operación en los logs del sistema
+
+🧪 COMANDO CURL DE PRUEBA:
+curl -X POST http://localhost:8002/api/productos/cargar_v2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "productos": [
+      {
+        "CODIGO": "TEST001",
+        "DESCRIPCION": "Producto de prueba",
+        "PRECIOA": 10.50,
+        "EXIS": 100
+      }
+    ],
+    "origen": "test"
+  }'
+
+📊 ENDPOINT DE ESTADO:
+GET http://localhost:8002/api/productos/status_v2
+
+================================================================
+📅 Fecha: 1 de septiembre 2025
+🏢 Empresa: Maruz Distribuciones
+🌐 Ambiente: Desarrollo
+📝 Versión: v2
+================================================================
+
+🔍 REPORTE TÉCNICO - SENTENCIAS SQL EXACTAS
+================================================================
+
+📝 1. SENTENCIA INSERT (Nuevo Producto):
+INSERT INTO productos (
+    codigo_producto, descripcion, pre_precio, precio_a, precio_b, 
+    precio_a_iva, precio_b_iva, ultimo_costo, costo_usd, utilidad,
+    existencia, almacen, unidad_medida, tipo_iva, marca, grupo, 
+    sub_grupo, codigo_barras, imagen1, imagen2, imagen3, 
+    imagen1_editada, imagen2_editada, imagen3_editada, metadata, 
+    nota, web, categoria, descripcion_producto, propiedades, 
+    datos_tecnicos, especificaciones, campos_aplicacion, 
+    envases_disponibles, pdf, recomendaciones, cont, pr, 
+    id_drive, qrt
+) VALUES (
+    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+)
+
+🔄 2. SENTENCIA UPDATE (Producto Existente):
+UPDATE productos 
+SET descripcion = %s, pre_precio = %s, precio_a = %s, precio_b = %s, 
+    precio_a_iva = %s, precio_b_iva = %s, ultimo_costo = %s, costo_usd = %s, 
+    utilidad = %s, existencia = %s, almacen = %s, unidad_medida = %s, 
+    tipo_iva = %s, marca = %s, grupo = %s, sub_grupo = %s, codigo_barras = %s, 
+    imagen1 = %s, imagen2 = %s, imagen3 = %s, imagen1_editada = %s, 
+    imagen2_editada = %s, imagen3_editada = %s, metadata = %s, nota = %s, 
+    web = %s, categoria = %s, descripcion_producto = %s, propiedades = %s, 
+    datos_tecnicos = %s, especificaciones = %s, campos_aplicacion = %s, 
+    envases_disponibles = %s, pdf = %s, recomendaciones = %s, cont = %s, 
+    pr = %s, id_drive = %s, qrt = %s, fecha_actualizacion = CURRENT_TIMESTAMP
+WHERE codigo_producto = %s
+
+📋 3. COLUMNAS INSERTADAS (41 columnas total):
+
+| # | Columna BD        | Campo JSON           | NOT NULL | Observaciones |
+|---|-------------------|----------------------|----------|---------------|
+| 1 | codigo_producto   | CODIGO               | ✅ SÍ    | Campo obligatorio |
+| 2 | descripcion       | DESCRIPCION          | ✅ SÍ    | Campo obligatorio |
+| 3 | pre_precio        | PRE_PRECIO           | ❌ No    | Decimal |
+| 4 | precio_a          | PRECIOA              | ❌ No    | Decimal |
+| 5 | precio_b          | PRECIOB              | ❌ No    | Decimal |
+| 6 | precio_a_iva      | PRECIOA + IVA        | ❌ No    | Decimal |
+| 7 | precio_b_iva      | PRECIOB + IVA        | ❌ No    | Decimal |
+| 8 | ultimo_costo      | ULTIMO_COSTO         | ❌ No    | Decimal |
+| 9 | costo_usd         | COSTO USD            | ❌ No    | Decimal |
+| 10| utilidad          | UTIL                 | ❌ No    | Decimal |
+| 11| existencia        | EXIS                 | ❌ No    | Integer |
+| 12| almacen           | ALMACEN              | ❌ No    | VARCHAR |
+| 13| unidad_medida     | UND MED              | ❌ No    | VARCHAR |
+| 14| tipo_iva          | TIPO IVA             | ❌ No    | VARCHAR |
+| 15| marca             | MARCA                | ❌ No    | VARCHAR |
+| 16| grupo             | GRUPO                | ❌ No    | VARCHAR |
+| 17| sub_grupo         | SUB GRUPO            | ❌ No    | VARCHAR |
+| 18| codigo_barras     | BARRAS               | ❌ No    | VARCHAR |
+| 19| imagen1           | IMAGEN1              | ❌ No    | VARCHAR |
+| 20| imagen2           | IMAGEN2              | ❌ No    | VARCHAR |
+| 21| imagen3           | IMAGEN3              | ❌ No    | VARCHAR |
+| 22| imagen1_editada   | IMAGEN1(EDITADA)     | ❌ No    | VARCHAR |
+| 23| imagen2_editada   | IMAGEN2(EDITADA)     | ❌ No    | VARCHAR |
+| 24| imagen3_editada   | IMAGEN3(EDITADA)     | ❌ No    | VARCHAR |
+| 25| metadata          | METADATA             | ❌ No    | TEXT |
+| 26| nota              | NOTA                 | ❌ No    | TEXT |
+| 27| web               | WEB                  | ❌ No    | VARCHAR |
+| 28| categoria         | CATEGORIA            | ❌ No    | VARCHAR |
+| 29| descripcion_producto | Descripción Producto | ❌ No    | TEXT |
+| 30| propiedades       | Propiedades          | ❌ No    | TEXT |
+| 31| datos_tecnicos    | Datos técnicos       | ❌ No    | TEXT |
+| 32| especificaciones  | Especificaciones     | ❌ No    | TEXT |
+| 33| campos_aplicacion | Campos de aplicación | ❌ No    | TEXT |
+| 34| envases_disponibles | Envases disponibles | ❌ No    | TEXT |
+| 35| pdf               | pdf                  | ❌ No    | VARCHAR |
+| 36| recomendaciones   | RECOMENDACIONES      | ❌ No    | TEXT |
+| 37| cont              | cont                 | ❌ No    | VARCHAR |
+| 38| pr                | PR                   | ❌ No    | VARCHAR |
+| 39| id_drive          | IDdrive              | ❌ No    | VARCHAR |
+| 40| qrt               | qrt                  | ❌ No    | VARCHAR |
+| 41| fecha_actualizacion | *(automático)*      | ✅ SÍ    | TIMESTAMP automático |
+
+🔑 4. COLUMNAS QUE NO ADMITEN NULL:
+- codigo_producto (validado en línea 53-54 del código)
+- descripcion (validado en línea 55-56 del código)  
+- fecha_actualizacion (se asigna automáticamente con CURRENT_TIMESTAMP)
+
+⚠️ 5. COMPORTAMIENTO ESPECIAL:
+- UPDATE: No actualiza codigo_producto (línea 144: if key != 'codigo_producto')
+- UPDATE: Siempre actualiza fecha_actualizacion = CURRENT_TIMESTAMP
+- INSERT: Todas las demás columnas pueden ser NULL excepto las 3 mencionadas
+- Validación: El código valida que CODIGO y DESCRIPCION no estén vacíos antes de ejecutar SQL
+
+🔍 6. MAPEO JSON → BD:
+CODIGO → codigo_producto
+DESCRIPCION → descripcion
+PRE_PRECIO → pre_precio
+PRECIOA → precio_a
+PRECIOB → precio_b
+PRECIOA + IVA → precio_a_iva
+PRECIOB + IVA → precio_b_iva
+ULTIMO_COSTO → ultimo_costo
+COSTO USD → costo_usd
+UTIL → utilidad
+EXIS → existencia
+ALMACEN → almacen
+UND MED → unidad_medida
+TIPO IVA → tipo_iva
+MARCA → marca
+GRUPO → grupo
+SUB GRUPO → sub_grupo
+BARRAS → codigo_barras
+IMAGEN1 → imagen1
+IMAGEN2 → imagen2
+IMAGEN3 → imagen3
+IMAGEN1(EDITADA) → imagen1_editada
+IMAGEN2(EDITADA) → imagen2_editada
+IMAGEN3(EDITADA) → imagen3_editada
+METADATA → metadata
+NOTA → nota
+WEB → web
+CATEGORIA → categoria
+Descripción Producto → descripcion_producto
+Propiedades → propiedades
+Datos técnicos → datos_tecnicos
+Especificaciones → especificaciones
+Campos de aplicación → campos_aplicacion
+Envases disponibles → envases_disponibles
+pdf → pdf
+RECOMENDACIONES → recomendaciones
+cont → cont
+PR → pr
+IDdrive → id_drive
+qrt → qrt
+
+================================================================
+📅 Fecha: 1 de septiembre 2025
+🏢 Empresa: Maruz Distribuciones
+🌐 Ambiente: Desarrollo
+📝 Versión: v2
+================================================================
