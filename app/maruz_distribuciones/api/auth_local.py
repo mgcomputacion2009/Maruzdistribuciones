@@ -37,83 +37,15 @@ def create_jwt_token(usuario):
 
 @auth_local_bp.route('/login', methods=['POST'])
 def login():
-    """Endpoint para login con email/contraseña"""
-    try:
-        if not request.is_json:
-            return jsonify({
-                'success': False,
-                'error': 'Content-Type debe ser application/json'
-            }), 400
-        
-        data = request.get_json()
-        email = data.get('email', '').strip().lower()
-        password = data.get('password', '')
-        
-        # Validaciones básicas
-        if not email or not password:
-            return jsonify({
-                'success': False,
-                'error': 'Email y contraseña son obligatorios'
-            }), 400
-        
-        # Buscar usuario
-        usuario = Usuario.buscar_por_email(email)
-        if not usuario:
-            logger.warning(f"Intento de login con email inexistente: {email}")
-            return jsonify({
-                'success': False,
-                'error': 'Credenciales inválidas'
-            }), 401
-        
-        # Verificar contraseña
-        if not usuario.verificar_password(password):
-            logger.warning(f"Intento de login con contraseña incorrecta para: {email}")
-            return jsonify({
-                'success': False,
-                'error': 'Credenciales inválidas'
-            }), 401
-        
-        # Verificar que el usuario esté activo
-        if not usuario.activo:
-            return jsonify({
-                'success': False,
-                'error': 'Cuenta deshabilitada'
-            }), 403
-        
-        # Generar token JWT
-        token = create_jwt_token(usuario)
-        if not token:
-            return jsonify({
-                'success': False,
-                'error': 'Error generando token de sesión'
-            }), 500
-        
-        # Actualizar último login
-        usuario.actualizar_ultimo_login()
-        
-        # Preparar respuesta
-        response_data = {
-            'success': True,
-            'message': 'Login exitoso',
-            'token': token,
-            'user': usuario.to_dict(),
-            'expires_in': 86400,  # 24 horas
-            'timestamp': datetime.now().isoformat()
-        }
-        
-        logger.info(f"✅ Login exitoso para: {email}")
-        return jsonify(response_data), 200
-        
-    except Exception as e:
-        logger.error(f"❌ Error en login: {e}")
-        return jsonify({
-            'success': False,
-            'error': 'Error interno del servidor'
-        }), 500
+    """Endpoint para login deshabilitado - solo OAuth"""
+    return jsonify({
+        'success': False,
+        'error': 'Login manual deshabilitado. Utiliza OAuth (Google) para autenticarte.'
+    }), 403
 
 @auth_local_bp.route('/register', methods=['POST'])
 def register():
-    """Endpoint para registro de nuevos usuarios"""
+    """Endpoint para registro de nuevos usuarios (solo OAuth)"""
     try:
         if not request.is_json:
             return jsonify({
@@ -123,21 +55,14 @@ def register():
         
         data = request.get_json()
         email = data.get('email', '').strip().lower()
-        password = data.get('password', '')
         nombre = data.get('nombre', '').strip()
         apellido = data.get('apellido', '').strip()
         
-        # Validaciones
-        if not email or not password or not nombre:
+        # Validaciones (sin contraseña)
+        if not email or not nombre:
             return jsonify({
                 'success': False,
-                'error': 'Email, contraseña y nombre son obligatorios'
-            }), 400
-        
-        if len(password) < 6:
-            return jsonify({
-                'success': False,
-                'error': 'La contraseña debe tener al menos 6 caracteres'
+                'error': 'Email y nombre son obligatorios'
             }), 400
         
         # Verificar si el email ya existe
@@ -147,14 +72,14 @@ def register():
                 'error': 'El email ya está registrado'
             }), 409
         
-        # Crear nuevo usuario
+        # Crear nuevo usuario (sin contraseña)
         nuevo_usuario = Usuario(
             email=email,
             nombre=nombre,
             apellido=apellido,
             rol='usuario'  # Rol por defecto
         )
-        nuevo_usuario.password = password
+        # No establecer contraseña - solo OAuth
         
         db.session.add(nuevo_usuario)
         db.session.commit()
@@ -164,14 +89,14 @@ def register():
         
         response_data = {
             'success': True,
-            'message': 'Usuario registrado exitosamente',
+            'message': 'Usuario registrado exitosamente (solo OAuth)',
             'token': token,
             'user': nuevo_usuario.to_dict(),
             'expires_in': 86400,
             'timestamp': datetime.now().isoformat()
         }
         
-        logger.info(f"✅ Usuario registrado exitosamente: {email}")
+        logger.info(f"✅ Usuario registrado exitosamente (OAuth): {email}")
         return jsonify(response_data), 201
         
     except Exception as e:

@@ -146,19 +146,6 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         
-        .development-badge {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
         
         .quick-access {
             text-align: center;
@@ -211,9 +198,6 @@
     </style>
 </head>
 <body>
-    <div class="development-badge">
-        <i class="fas fa-code"></i> DESARROLLO - Puerto 8002
-    </div>
     
     <div class="header">
         <img src="{{ url_for('static', filename='images/maruz-logo-distribuciones.png') }}" 
